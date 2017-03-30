@@ -19,6 +19,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 public class GoogleOCR {
 
 	private static final String LINE_SEPARATOR			=	"</td></tr><tr><td>";
@@ -71,8 +74,8 @@ public class GoogleOCR {
 			}
 
 			System.out.println("result -> " + result);
-			JSONObject jsonObject = new JSONObject(result);
-			JSONArray array = (JSONArray) jsonObject.get("responses");
+			JsonObject jsonObject = new JsonObject(result);
+			JsonArray array = (JsonArray) jsonObject.get("responses");
 			JSONArray array1 = (JSONArray) array.getJSONObject(0).getJSONArray("textAnnotations");
 			
 			

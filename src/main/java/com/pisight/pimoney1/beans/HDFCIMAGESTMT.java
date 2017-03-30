@@ -9,12 +9,15 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.pisight.pimoney.models.CardAccount;
+import com.pisight.pimoney.models.CardTransaction;
+
 public class HDFCIMAGESTMT {
 
 	public void tempHDFCCARDIMAGE(WebDriver driver){
 		WebElement page = driver.findElement(By.id("PDF_TO_HTML"));
 
-		CardAccount ca = new CardAccount();
+		CardAccount ca = new CardAccount(null);
 
 		WebElement date1 = null;
 		WebElement date2 = null;
