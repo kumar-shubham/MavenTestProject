@@ -112,9 +112,9 @@ public class PDFExtracter2 extends PDFTextStripper {
 
 		textStripper.setSortByPosition(true);
 //
-//		textStripper.setWordSeparator(wordSeparator);
+		textStripper.setWordSeparator(wordSeparator);
 //
-//		textStripper.setLineSeparator(LINE_SEPARATOR);
+		textStripper.setLineSeparator(LINE_SEPARATOR);
 
 
 		if(null == this.pdDocument){

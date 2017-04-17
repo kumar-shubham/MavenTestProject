@@ -36,6 +36,10 @@ public class InvestmentTransaction extends TransactionBase{
 	private String assetBondIssuer = null;
 	private String assetISIN = null;
 	private String valuationDate = null;
+	private String startDate = null;
+	private String maturityDate = null;
+	private String coupon = null;
+	private String accruedInterest = null;
 	private String dateFormat = null;
 
 	/**
@@ -345,6 +349,63 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setDescription(String description) {
 		if(StringUtils.isNotEmpty(description)){
 			this.description = description;
+		}
+	}
+	
+	/**
+	 * @return the startDate
+	 */
+	public String getStartDate() {
+		return startDate;
+	}
+	/**
+	 * @param startDate the startDate to set
+	 */
+	public void setStartDate(String startDate) {
+		if(StringUtils.isNotEmpty(startDate)){
+			this.startDate = startDate;
+		}
+	}
+	/**
+	 * @return the maturityDate
+	 */
+	public String getMaturityDate() {
+		return maturityDate;
+	}
+	/**
+	 * @param maturityDate the maturityDate to set
+	 */
+	public void setMaturityDate(String maturityDate) {
+		if(StringUtils.isNotEmpty(maturityDate)){
+			this.maturityDate = maturityDate;
+		}
+	}
+	/**
+	 * @return the coupon
+	 */
+	public String getCoupon() {
+		return coupon;
+	}
+	/**
+	 * @param coupon the coupon to set
+	 */
+	public void setCoupon(String coupon) {
+		if(StringUtils.isNotEmpty(coupon)){
+			this.coupon = coupon;
+		}
+	}
+	/**
+	 * @return the accruedInterest
+	 */
+	public String getAccruedInterest() {
+		return accruedInterest;
+	}
+	/**
+	 * @param accruedInterest the accruedInterest to set
+	 */
+	public void setAccruedInterest(String accruedInterest) {
+		if(StringUtils.isNotEmpty(accruedInterest)){
+			this.accruedInterest = accruedInterest;
 		}
 	}
 	/**

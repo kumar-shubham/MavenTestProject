@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.apache.pdfbox.exceptions.CryptographyException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -64,11 +63,11 @@ public class CITIBankSGPDF {
 
 		PDFExtracter boxTest = null;
 		try{
-//			boxTest = new PDFExtracter(getFile("investments/new", "Citibank_eStatement_11302016", "pdf"),"");
+			//			boxTest = new PDFExtracter(getFile("investments/new", "Citibank_eStatement_11302016", "pdf"),"");
 			boxTest = new PDFExtracter(getFile("CITI", "CITI1", "pdf"),"");
-		}catch(CryptographyException e){
-			if(e.getMessage().contains("The supplied password does not match")){
-				System.out.println("The supplied password does not match");
+		}catch(Exception e){
+			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
+				System.out.println("Cannot decrypt PDF, the password is incorrect");
 			}
 			throw e;
 		}
@@ -91,10 +90,10 @@ public class CITIBankSGPDF {
 
 
 			driver.quit();
-			
+
 			System.out.println("Total Time Taken -> " + (System.currentTimeMillis()-start) + " ms");
 		}
-		
+
 
 	}
 
@@ -176,52 +175,53 @@ public class CITIBankSGPDF {
 
 		logger.info("#@#@#@#@##@#@##@#@#@##@#@#@#@#@##@#@#@#@#@#@##@#@#@#@#");
 		logger.info("");
-		
+
 		HashMap<String, Container> accountMap = new HashMap<String, Container>();
 		WebElement stmtDateEle = driver.findElement(By.xpath("//td[contains(text(), 'Equivalent Balance')]"));
 		String stmtDate = stmtDateEle.getText().trim();
-		
+
 		String stmtDateRegex = ".* Equivalent Balance - ([A-Za-z]{3} \\d{2} \\d{4})";
 		Pattern pStmt = Pattern.compile(stmtDateRegex);
 		Matcher mStmt = pStmt.matcher(stmtDate);
 		if(mStmt.matches()){
 			stmtDate = mStmt.group(1);
-			stmtDate = ParserUtility.convertDateStringToPimoneyFormat(stmtDate, Constants.DATEFORMAT_MMM_SPACE_DD_SPACE_YYYY);
+			stmtDate = ParserUtility.convertToPimoneyDate(stmtDate, Constants.DATEFORMAT_MMM_SPACE_DD_SPACE_YYYY);
 		}
-		
+
 		List<Container> accounts = new ArrayList<Container>();
-		
+
 		String checkingXpath = "//tr[preceding-sibling::tr/td[text() = 'Checking'] and following-sibling::tr/td[contains(text(), 'Checking Total')]]";
 		String savingXpath = "//tr[preceding-sibling::tr/td[text() = 'Savings & Investments'] and following-sibling::tr/td[contains(text(), 'Savings & Investments Total')]]";
-		
+
 		List<WebElement> accountRows = driver.findElements(By.xpath(checkingXpath));
-		
+
 		accountRows.addAll(driver.findElements(By.xpath(savingXpath)));
-		
+
 		String accountRegex = "(.*) (\\d+) ([A-Za-z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*)";
 		Pattern pAcc = Pattern.compile(accountRegex);
 		Matcher mAcc = null;
-		
+
 		for(WebElement row: accountRows){
 			String rowText = row.getText().trim();
-			
+
 			System.out.println("RowText -> " + rowText);
-			
+
 			mAcc = pAcc.matcher(rowText);
-			
+
 			if(rowText.contains("Savings & Investments Total")){
 				break;
 			}
-			
+
 			if(mAcc.matches()){
 				String accountName = mAcc.group(1);
 				String accountNumber = mAcc.group(2);
 				String currency = mAcc.group(3);
 				String balance = mAcc.group(4);
-				
+
 				if(!accountMap.containsKey(accountNumber)){
-					
-					if(rowText.toLowerCase().contains("investment")){
+
+					if((rowText.toLowerCase().contains("investment") || rowText.toLowerCase().contains("brokerage")) &&
+							!rowText.toLowerCase().contains("cash")){
 						InvestmentAccount account = new InvestmentAccount(properties);
 						account.setAccountName(accountName);
 						account.setAccountNumber(accountNumber);
@@ -241,34 +241,34 @@ public class CITIBankSGPDF {
 						accounts.add(account);
 						accountMap.put(accountNumber, account);
 					}
-					
-					
+
+
 				}
 			}
 		}
-		
+
 		String transXpath = "//tr[preceding-sibling::tr/td[contains(text(), 'DETAILS OF YOUR')]]";
-		
+
 		List<WebElement> transRows = driver.findElements(By.xpath(transXpath));
-		
+
 		String transRegex = "([A-Za-z]{3} \\d{2} \\d{4}) ([A-Za-z]{3} \\d{2} \\d{4}) (.*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*)";
 		String headerRegex = "(.*) (\\d{10}) ([A-Za-z]{3})( .*)?";
-		
+
 		Pattern pTrans = Pattern.compile(transRegex);
 		Pattern pHeader = Pattern.compile(headerRegex);
 		Matcher mTrans = null;
 		Matcher mHeader = null;
-		
+
 		String lastBalance = null;
 		BankAccount currenctAccount = null;
 		for(WebElement row: transRows){
 			String rowText = row.getText().trim();
-			
+
 			System.out.println("Row text -> " + rowText);
-			
+
 			mTrans = pTrans.matcher(rowText);
 			mHeader = pHeader.matcher(rowText);
-			
+
 			if(mTrans.matches() && currenctAccount != null){
 				String transDate = mTrans.group(1);
 				String valueDate = mTrans.group(2);
@@ -276,64 +276,64 @@ public class CITIBankSGPDF {
 				String amount = mTrans.group(4);
 				String runningBalance = mTrans.group(5);
 				String type = null;
-				
+
 				runningBalance = ParserUtility.formatAmount(runningBalance);
 				lastBalance = ParserUtility.formatAmount(runningBalance);
-				
+
 				double runningBalanceD = Double.parseDouble(runningBalance);
 				double lastBalanceD = Double.parseDouble(lastBalance);
-				
+
 				if(runningBalanceD - lastBalanceD > 0){
 					type = BankTransaction.TRANSACTION_TYPE_CREDIT;
 				}
 				else{
 					type = BankTransaction.TRANSACTION_TYPE_DEBIT;
 				}
-				
+
 				BankTransaction transaction = new BankTransaction();
 				transaction.setAccountNumber(currenctAccount.getAccountNumber());
-				transaction.setTransDate(ParserUtility.convertDateStringToPimoneyFormat(transDate, Constants.DATEFORMAT_MMM_SPACE_DD_SPACE_YYYY));
-				transaction.setPostDate(ParserUtility.convertDateStringToPimoneyFormat(valueDate, Constants.DATEFORMAT_MMM_SPACE_DD_SPACE_YYYY));
+				transaction.setTransDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_MMM_SPACE_DD_SPACE_YYYY));
+				transaction.setPostDate(ParserUtility.convertToPimoneyDate(valueDate, Constants.DATEFORMAT_MMM_SPACE_DD_SPACE_YYYY));
 				transaction.setAmount(ParserUtility.formatAmount(amount));
 				transaction.setTransactionType(type);
 				transaction.setCurrency(currenctAccount.getCurrency());
 				transaction.setDescription(description);
 				currenctAccount.addTransaction(transaction);
-				
+
 			}
 			else if(mHeader.matches()){
 				String accountNumber = mHeader.group(2);
 				currenctAccount = (BankAccount) accountMap.get(accountNumber);
 			}
-			
+
 		}
-		
+
 		String fundXpath = "//tr[preceding-sibling::tr/td[contains(text(), 'InvestmentFunds')]]/preceding-sibling::tr[1]";
-		
+
 		List<WebElement> fundRows = driver.findElements(By.xpath(fundXpath));
-		
+
 		String fundRegex = "(.*) ([A-Za-z]{3}) (−?(?:\\d*,)*\\d+\\.?\\d*) (−?(?:\\d*,)*\\d+\\.?\\d*) "
 				+ "(−?(?:\\d*,)*\\d+\\.?\\d*) (−?(?:\\d*,)*\\d+\\.?\\d*) (−?(?:\\d*,)*\\d+\\.?\\d*)";
 		headerRegex = "InvestmentFunds (\\d{10})( .*)?";
-		
+
 		Pattern pFunds = Pattern.compile(fundRegex);
 		pHeader = Pattern.compile(headerRegex);
 		Matcher mFunds = null;
 		mHeader = null;
-		
+
 		HoldingAsset currentAsset = null;
 		InvestmentAccount currenctInvAccount = null;
 		int count = 3;
 		// taking 2 more lines for description if the length is less than 25 char
 		for(WebElement row: fundRows){
-			
+
 			String rowText = row.getText().trim();
-			
+
 			System.out.println("Row Text -> " + rowText);
-			
+
 			mFunds = pFunds.matcher(rowText);
 			mHeader = pHeader.matcher(rowText);
-			
+
 			if(mHeader.matches()){
 				System.out.println("Investment Fund Header Matched");
 				currenctInvAccount = (InvestmentAccount) accountMap.get(mHeader.group(1));
@@ -346,9 +346,9 @@ public class CITIBankSGPDF {
 				String totalCost = mFunds.group(4);
 				String totalValue = mFunds.group(6);
 				String unitPrice = mFunds.group(7);
-				
+
 				HoldingAsset asset = new HoldingAsset();
-				
+
 				asset.setHoldingAssetAccountNumber(currenctInvAccount.getAccountNumber());
 				asset.setHoldingAssetDescription(description);
 				asset.setHoldingAssetCurrency(currency);
@@ -373,12 +373,14 @@ public class CITIBankSGPDF {
 				else{
 					currentAsset = null;
 				}
-				
+
 			}
 			else{
 				count++;
 			}
 		}
+
+		getBrokerageAccountDetails(driver, accountMap);
 
 		ObjectMapper mapper = new ObjectMapper();
 		Path p = Paths.get(System.getProperty("user.home"), "Documents", "bankStmt.json");
@@ -399,4 +401,121 @@ public class CITIBankSGPDF {
 			e.printStackTrace();
 		}
 	}
+
+	private static void getBrokerageAccountDetails(WebDriver driver, HashMap<String, Container> accountMap) throws Exception {
+		// TODO Auto-generated method stub
+		String fundXpath = "//tr[preceding-sibling::tr/td[text() = 'Brokerage']]/preceding-sibling::tr[3]/following-sibling::tr";
+
+		List<WebElement> fundRows = driver.findElements(By.xpath(fundXpath));
+
+		String fundRegex = "(.*) \\w+ ([A-Z]{3}) (−?(?:\\d*,)*\\d+\\.?\\d*) (−?(?:\\d*,)*\\d+\\.?\\d*) (−?(?:\\d*,)*\\d+\\.?\\d*) "
+				+ "(−?(?:\\d*,)*\\d+\\.?\\d*) (−?(?:\\d*,)*\\d+\\.?\\d*)";
+		String transRegex = "([A-z]{3} \\d{1,2} \\d{4}) (.*) ([A-Z]{3}) (.*) \\d+ (−?(?:\\d*,)*\\d+\\.?\\d*) (−?(?:\\d*,)*\\d+\\.?\\d*) "
+				+ "(−?(?:\\d*,)*\\d+\\.?\\d*)";
+		String headerRegex = "Brokerage .*(\\d{10})";
+
+		Pattern pFunds = Pattern.compile(fundRegex);
+		Pattern pTrans = Pattern.compile(transRegex);
+		Pattern pHeader = Pattern.compile(headerRegex);
+		Matcher mFunds = null;
+		Matcher mTrans = null;
+		Matcher mHeader = null;
+
+		HoldingAsset currentAsset = null;
+		InvestmentAccount currenctInvAccount = null;
+		int count = 4;
+		// taking 3 more lines for description if the length is less than 25 char
+		for(WebElement row: fundRows){
+
+			String rowText = row.getText().trim();
+
+			System.out.println("Row Text -> " + rowText);
+			
+			
+			if(rowText.contains("FEEDBACK FROM YOU") || rowText.contains("CONSOLIDATED STATEMENT OF INTEREST EARNED")){
+				break;
+			}
+
+			mFunds = pFunds.matcher(rowText);
+			mTrans = pTrans.matcher(rowText);
+			mHeader = pHeader.matcher(rowText);
+
+			if(mHeader.matches()){
+				System.out.println("Brokerage Header Matched");
+				currenctInvAccount = (InvestmentAccount) accountMap.get(mHeader.group(1));
+			}
+			else if(mFunds.matches() && currenctInvAccount!= null){
+				count = 1;
+				String description = mFunds.group(1);
+				String currency = mFunds.group(2);
+				String totalCost = mFunds.group(4);
+				String quantity = mFunds.group(5);
+				String unitPrice = mFunds.group(6);
+				String totalValue = mFunds.group(7);
+				
+
+				HoldingAsset asset = new HoldingAsset();
+
+				asset.setHoldingAssetAccountNumber(currenctInvAccount.getAccountNumber());
+				asset.setHoldingAssetDescription(description);
+				asset.setHoldingAssetCurrency(currency);
+				asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
+				asset.setHoldingAssetCost(ParserUtility.formatAmount(totalCost));
+				asset.setHoldingAssetCurrentValue(ParserUtility.formatAmount(totalValue));
+				asset.setHoldingAssetIndicativePrice(unitPrice);
+				asset.setHoldingAssetCategory("Unit Trust");
+				asset.setHoldingAssetSubCategory("Equity");
+				currentAsset = asset;
+				currenctInvAccount.addAsset(asset);
+			}
+			else if(mTrans.matches() && currenctInvAccount != null){
+				count = 4;
+				currentAsset = null;
+				
+				String transDate = mTrans.group(1);
+				String description = mTrans.group(2);
+				String currency = mTrans.group(3);
+				String type = mTrans.group(4);
+				String quantity = mTrans.group(5);
+				String unitPrice = mTrans.group(6);
+				String amount = mTrans.group(7);
+				
+				InvestmentTransaction transaction = new InvestmentTransaction();
+				
+				transaction.setAccountNumber(currenctInvAccount.getAccountNumber());
+				transaction.setTransactionDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_MMM_SPACE_DD_SPACE_YYYY));
+				transaction.setDescription(description);
+				transaction.setCurrency(currency);
+				transaction.setAssetQuantity(ParserUtility.formatAmount(quantity));
+				transaction.setAssetUnitCost(ParserUtility.formatAmount(unitPrice));
+				transaction.setAmount(ParserUtility.formatAmount(amount));
+				
+				if(type.toLowerCase().contains("dividend")){
+					transaction.setType(InvestmentTransaction.TRANSACTION_TYPE_CREDIT);
+				}
+				else{
+					throw new Exception("New Transaction Type Keyword Found. Need to handle.");
+				}
+				currenctInvAccount.addTransaction(transaction);
+				
+			}
+			else if(count > 0 && count < 4){
+				if(rowText.length() <= 25 && currentAsset!= null){
+					String description = currentAsset.getHoldingAssetDescription() + " " + rowText;
+					currentAsset.setHoldingAssetDescription(description.trim());
+					if(count == 3){
+						currentAsset = null;
+					}
+					count++;
+				}
+				else{
+					currentAsset = null;
+				}
+			}
+			else{
+				count++;
+			}
+		}
+	}
+
 }

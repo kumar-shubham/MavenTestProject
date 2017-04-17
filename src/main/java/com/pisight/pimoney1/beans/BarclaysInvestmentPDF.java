@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.pdfbox.exceptions.CryptographyException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -61,10 +60,20 @@ public class BarclaysInvestmentPDF {
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 
 
-		PDFExtracter boxTest = null;
+		/*PDFExtracter boxTest = null;
 		try{
 			boxTest = new PDFExtracter(getFile("investments", "barclays_inv_sg", "pdf"),"");
 		}catch(CryptographyException e){
+			if(e.getMessage().contains("The supplied password does not match")){
+				System.out.println("The supplied password does not match");
+			}
+			throw e;
+		}*/
+		
+		PDFExtracter2 boxTest = null;
+		try{
+			boxTest = new PDFExtracter2(getFile("investments", "barclays_inv_sg", "pdf"),"");
+		}catch(Exception e){
 			if(e.getMessage().contains("The supplied password does not match")){
 				System.out.println("The supplied password does not match");
 			}
@@ -189,7 +198,7 @@ public class BarclaysInvestmentPDF {
 		if(accountM.matches()){
 			stmtDate = accountM.group(1);
 			balance = accountM.group(2);
-			stmtDate = ParserUtility.convertDateStringToPimoneyFormat(stmtDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY);
+			stmtDate = ParserUtility.convertToPimoneyDate(stmtDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY);
 			balance = formatAmount(balance);
 		}
 
@@ -893,8 +902,9 @@ public class BarclaysInvestmentPDF {
 	private static void getSecurityTransaction(String rowText, InvestmentAccount account) throws Exception {
 		// TODO Auto-generated method stub
 		System.out.print("Inside 7 ");
-		String regex = "(.*) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) ?%?([A-z]{3})? "
-				+ "(\\(?(?:\\d*,)*\\d+\\.?\\d{4}\\)?) ?%?([A-z]{3})? (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) ?%?([A-z]{3})? \\d{9}";
+		String regex = "(.*) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) ?%?"
+				+ "([A-z]{3})?(?: (\\(?(?:\\d*,)*\\d+\\.?\\d{4}\\)?) ?%?([A-z]{3})?)?(?: (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) ?%?"
+				+ "([A-z]{3})?)? (\\d{9})";
 
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(rowText);
@@ -915,6 +925,12 @@ public class BarclaysInvestmentPDF {
 			String type = null;
 
 			amount = formatAmount(amount);
+			quantity = formatAmount(quantity);
+			unitPrice = formatAmount(unitPrice);
+			
+			if(StringUtils.isEmpty(amount)){
+				amount = formatAmount(quantity);
+			}
 
 			if(amount.toLowerCase().contains("-")){
 				type = InvestmentTransaction.TRANSACTION_TYPE_CREDIT;
@@ -922,14 +938,20 @@ public class BarclaysInvestmentPDF {
 			else{
 				type = InvestmentTransaction.TRANSACTION_TYPE_DEBIT;
 			}
-			amount = amount.replace("-", "");
-			quantity = quantity.replace("-", "");
-			unitPrice = unitPrice.replace("-", "");
+			if(StringUtils.isNotEmpty(amount)){
+				amount = amount.replace("-", "");
+			}
+			if(StringUtils.isNotEmpty(quantity)){
+				quantity = quantity.replace("-", "");
+			}
+			if(StringUtils.isNotEmpty(unitPrice)){
+				unitPrice = unitPrice.replace("-", "");
+			}
 
 			InvestmentTransaction transaction = new InvestmentTransaction();
 
-			transaction.setTransactionDate(ParserUtility.convertDateStringToPimoneyFormat(transDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
-			transaction.setValuationDate(ParserUtility.convertDateStringToPimoneyFormat(valueDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setTransactionDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setValuationDate(ParserUtility.convertToPimoneyDate(valueDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
 			transaction.setDescription(formatDescription(description));
 			transaction.setType(type);
 			transaction.setAssetQuantity(formatAmount(quantity));
@@ -990,9 +1012,9 @@ public class BarclaysInvestmentPDF {
 
 			InvestmentTransaction transaction = new InvestmentTransaction();
 
-			transaction.setTransactionDate(ParserUtility.convertDateStringToPimoneyFormat(transDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setTransactionDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
 			transaction.setDescription(formatDescription(description));
-			transaction.setValuationDate(ParserUtility.convertDateStringToPimoneyFormat(valueDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setValuationDate(ParserUtility.convertToPimoneyDate(valueDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
 			transaction.setAmount(formatAmount(amount));
 			transaction.setType(type);
 			transaction.setCurrency(transCurrency);
@@ -1005,25 +1027,24 @@ public class BarclaysInvestmentPDF {
 	private static void getLoanTransaction(String rowText, InvestmentAccount account) throws ParseException {
 		// TODO Auto-generated method stub
 		System.out.print("Inside 9 ");
-		String regex = "(.*) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (?:\\d{1,2}\\-[A-z]{3}\\-\\d{2}) to "
-				+ "(?:\\d{1,2}\\-[A-z]{3}\\-\\d{2}) ((?:\\d*,)*\\d+\\.?\\d{4}) % (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) "
-				+ "(\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?)( \\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?)? (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) ([A-z]{3}) \\d{9}";
-		String accRegex = "(\\d{8}\\.\\d{4})\\/([A-z]{3}) \\([A-z]{3}\\) \\([A-z]{3}\\)";
+		String regex = "(.*) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) (\\d{1,2}\\-[A-z]{3}\\-\\d{2}) to "
+				+ "(\\d{1,2}\\-[A-z]{3}\\-\\d{2}) ((?:\\d*,)*\\d+\\.?\\d{4}) % (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) "
+				+ "(\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?)( \\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?)? (\\(?(?:\\d*,)*\\d+\\.?\\d{2}\\)?) ([A-z]{3}) (\\d{9})";
 		Pattern p = Pattern.compile(regex);
-		Pattern accP = Pattern.compile(accRegex);
 		Matcher m = p.matcher(rowText);
-		Matcher accM = accP.matcher(rowText);
 
-		if(accM.matches()){
-			subAccNum = accM.group(1);
-			transCurrency = accM.group(2);
-		}
-		else if(m.matches()){
+		if(m.matches()){
 			System.out.println("Matched 9");
 			String description = m.group(1);
 			String transDate = m.group(2);
 			String valueDate = m.group(3);
-			String amount = m.group(4);
+			String startDate = m.group(4);
+			String maturityDate = m.group(5);
+			String coupon = m.group(6);
+			String amount = m.group(7);
+			String accruedInterest = m.group(9);
+			transCurrency = m.group(11);
+			subAccNum = m.group(12);
 			String type = null;
 
 			if(amount.contains("(")){
@@ -1035,10 +1056,14 @@ public class BarclaysInvestmentPDF {
 
 			InvestmentTransaction transaction = new InvestmentTransaction();
 
-			transaction.setTransactionDate(ParserUtility.convertDateStringToPimoneyFormat(transDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setTransactionDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
 			transaction.setDescription(description);
-			transaction.setValuationDate(ParserUtility.convertDateStringToPimoneyFormat(valueDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setValuationDate(ParserUtility.convertToPimoneyDate(valueDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
 			transaction.setAmount(formatAmount(amount));
+			transaction.setStartDate(ParserUtility.convertToPimoneyDate(startDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setMaturityDate(ParserUtility.convertToPimoneyDate(maturityDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YY));
+			transaction.setCoupon(ParserUtility.formatAmount(coupon));
+			transaction.setAccruedInterest(ParserUtility.formatAmount(accruedInterest));
 			transaction.setType(type);
 			transaction.setCurrency(transCurrency);
 			transaction.setSubAccountNumber(subAccNum);
@@ -1100,7 +1125,7 @@ public class BarclaysInvestmentPDF {
 				String securityId = m.group(7);
 				
 				asset.setHoldingAssetStrikePrice(formatAmount(strikePrice));
-				asset.setHoldingAssetBondMaturityDate(ParserUtility.convertDateStringToPimoneyFormat(maturity, Constants.DATEFORMAT_DD_DOT_MM_DOT_YYYY));
+				asset.setHoldingAssetBondMaturityDate(ParserUtility.convertToPimoneyDate(maturity, Constants.DATEFORMAT_DD_DOT_MM_DOT_YYYY));
 				asset.setHoldingAssetSecurityId(securityId);
 			}
 		}
@@ -1125,7 +1150,7 @@ public class BarclaysInvestmentPDF {
 				String isin = m1.group(3);
 				
 				asset.setHoldingAssetCoupon(formatAmount(coupon));
-				asset.setHoldingAssetBondMaturityDate(ParserUtility.convertDateStringToPimoneyFormat(maturity, Constants.DATEFORMAT_DD_SPACE_MMM_SPACE_YY));
+				asset.setHoldingAssetBondMaturityDate(ParserUtility.convertToPimoneyDate(maturity, Constants.DATEFORMAT_DD_SPACE_MMM_SPACE_YY));
 				asset.setHoldingAssetISIN(isin);
 				System.out.println("Maturity 1 ->>>> " + maturity + " ->> " + asset.getHoldingAssetBondMaturityDate());
 			}
@@ -1133,7 +1158,7 @@ public class BarclaysInvestmentPDF {
 				String maturity = m2.group(1);
 				String isin = m2.group(2);
 				
-				asset.setHoldingAssetBondMaturityDate(ParserUtility.convertDateStringToPimoneyFormat(maturity, Constants.DATEFORMAT_DD_SPACE_MMM_SPACE_YY));
+				asset.setHoldingAssetBondMaturityDate(ParserUtility.convertToPimoneyDate(maturity, Constants.DATEFORMAT_DD_SPACE_MMM_SPACE_YY));
 				asset.setHoldingAssetISIN(isin);
 				System.out.println("Maturity 2 ->>>> " + maturity + " ->> " + asset.getHoldingAssetBondMaturityDate());
 			}

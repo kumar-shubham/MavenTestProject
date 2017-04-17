@@ -70,10 +70,10 @@ public class MyClass2 {
 
 		PDFExtracter2 boxTest = null;
 		try{
-			boxTest = new PDFExtracter2(getFile("investments", "823512 EUR", "pdf"),"");
+			boxTest = new PDFExtracter2(getFile("HDFC", "4893XXXXXXXXXX32_14-07-2016", "pdf"),"");
 		}catch(Exception e){
-			if(e.getMessage().contains("The supplied password does not match")){
-				System.out.println("The supplied password does not match");
+			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
+				System.out.println("Cannot decrypt PDF, the password is incorrect");
 			}
 			throw e;
 		}
@@ -192,7 +192,7 @@ public class MyClass2 {
 
 		if(dateM.matches()){
 			dateText = dateM.group(1);
-			dateText = ParserUtility.convertDateStringToPimoneyFormat(dateText, Constants.DATEFORMAT_DD_SPACE_MMMM_SPACE_YYYY);
+			dateText = ParserUtility.convertToPimoneyDate(dateText, Constants.DATEFORMAT_DD_SPACE_MMMM_SPACE_YYYY);
 		}
 
 		System.out.println("Stmt Date -> " + dateText);
@@ -441,7 +441,7 @@ public class MyClass2 {
 			HoldingAsset asset = new HoldingAsset();
 			asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
 			asset.setHoldingAssetDescription(description);
-			asset.setHoldingAssetBondMaturityDate(ParserUtility.convertDateStringToPimoneyFormat(maturityDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+			asset.setHoldingAssetBondMaturityDate(ParserUtility.convertToPimoneyDate(maturityDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
 			asset.setHoldingAssetCurrency(currency);
 			asset.setHoldingAssetAverageUnitCost(ParserUtility.formatAmount(unitCost));
 			asset.setHoldingAssetIndicativePrice(ParserUtility.formatAmount(currentUnitPrice));
@@ -499,7 +499,7 @@ public class MyClass2 {
 			asset.setHoldingAssetCurrency(currency);
 			asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
 			asset.setHoldingAssetDescription(description);
-			asset.setHoldingAssetBondMaturityDate(ParserUtility.convertDateStringToPimoneyFormat(maturityDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+			asset.setHoldingAssetBondMaturityDate(ParserUtility.convertToPimoneyDate(maturityDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
 			asset.setHoldingAssetAverageUnitCost(ParserUtility.formatAmount(unitCost));
 			asset.setHoldingAssetIndicativePrice(ParserUtility.formatAmount(currentUnitValue));
 			asset.setHoldingAssetCurrentValue(ParserUtility.formatAmount(currentTotalValue));
@@ -655,7 +655,7 @@ public class MyClass2 {
 			asset.setHoldingAssetCurrency(currency);
 			asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
 			asset.setHoldingAssetDescription(description);
-			asset.setHoldingAssetBondMaturityDate(ParserUtility.convertDateStringToPimoneyFormat(maturityDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+			asset.setHoldingAssetBondMaturityDate(ParserUtility.convertToPimoneyDate(maturityDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
 			asset.setHoldingAssetAverageUnitCost(ParserUtility.formatAmount(unitCost));
 			asset.setHoldingAssetIndicativePrice(ParserUtility.formatAmount(currentUnitValue));
 			asset.setHoldingAssetCurrentValue(ParserUtility.formatAmount(currentTotalValue));
@@ -794,9 +794,9 @@ public class MyClass2 {
 
 			InvestmentTransaction transaction = new InvestmentTransaction();
 
-			transaction.setTransactionDate(ParserUtility.convertDateStringToPimoneyFormat(transDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+			transaction.setTransactionDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
 			transaction.setDescription(description);
-			transaction.setValuationDate(ParserUtility.convertDateStringToPimoneyFormat(valueDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+			transaction.setValuationDate(ParserUtility.convertToPimoneyDate(valueDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
 			transaction.setAmount(ParserUtility.formatAmount(amount));
 			transaction.setType(type);
 			transaction.setCurrency(transCurrency);
@@ -842,8 +842,8 @@ public class MyClass2 {
 			
 			InvestmentTransaction transaction = new InvestmentTransaction();
 			
-			transaction.setTransactionDate(ParserUtility.convertDateStringToPimoneyFormat(transDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
-			transaction.setValuationDate(ParserUtility.convertDateStringToPimoneyFormat(valueDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+			transaction.setTransactionDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+			transaction.setValuationDate(ParserUtility.convertToPimoneyDate(valueDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
 			transaction.setDescription(description);
 			transaction.setType(type);
 			transaction.setAssetQuantity(ParserUtility.formatAmount(quantity));

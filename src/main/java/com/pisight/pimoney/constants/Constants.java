@@ -28,6 +28,7 @@ public class Constants {
 	public static final String DATEFORMAT_DD_DASH_MMM_DASH_YY = "dd-MMM-yy";
 	public static final String DATEFORMAT_DD_SPACE_MMM_SPACE_YY = "dd MMM yy";
 	public static final String DATEFORMAT_DD_SLASH_MM_SLASH_YY = "dd/MM/yy";
+	public static final String DATEFORMAT_DD_MMM_YYYY = "ddMMMyyyy";
 	
 	public static final String DATEFORMAT_MM_SPACE_DD = "MM dd";
 	public static final String DATEFORMAT_DD_SPACE_MMM = "dd MMM";
@@ -95,6 +96,7 @@ public class Constants {
 		dateFormatList.add(DATEFORMAT_DD_DASH_MMM_DASH_YY);
 		dateFormatList.add(DATEFORMAT_DD_SPACE_MMM_SPACE_YY);
 		dateFormatList.add(DATEFORMAT_DD_SLASH_MM_SLASH_YY);
+		dateFormatList.add(DATEFORMAT_DD_MMM_YYYY);
 	}
 
 }

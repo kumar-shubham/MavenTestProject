@@ -87,9 +87,9 @@ public class PDFTest {
 		PDFExtracter pdfExtractor = null;
 		try{
 			pdfExtractor = new PDFExtracter(getFile("HDFC", "52913630_1475827655982", "pdf"), "KUMA1932");
-		}catch(CryptographyException e){
-			if(e.getMessage().contains("The supplied password does not match")){
-				System.out.println("The supplied password does not match");
+		}catch(Exception e){
+			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
+				System.out.println("Cannot decrypt PDF, the password is incorrect");
 			}
 			throw e;
 		}
@@ -97,9 +97,9 @@ public class PDFTest {
 		BoxTest boxTest = null;
 		try{
 			boxTest = new BoxTest(getFile("AMEX", "Statement_Oct 2015", "pdf"), "");
-		}catch(CryptographyException e){
-			if(e.getMessage().contains("The supplied password does not match")){
-				System.out.println("The supplied password does not match");
+		}catch(Exception e){
+			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
+				System.out.println("Cannot decrypt PDF, the password is incorrect");
 			}
 			throw e;
 		}

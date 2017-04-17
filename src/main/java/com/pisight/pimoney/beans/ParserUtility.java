@@ -131,7 +131,7 @@ public class ParserUtility {
 	 * @return formated date string
 	 * @throws ParseException
 	 */
-	public static String convertDateStringToPimoneyFormat(String oldDate, String format) throws ParseException{
+	public static String convertToPimoneyDate(String oldDate, String format) throws ParseException{
 
 		logger.info("inside convertDateStringToPimoneyFormat with date string :: " + oldDate + " and format :: " + format);
 		if(StringUtils.isEmpty(oldDate)){
@@ -158,7 +158,7 @@ public class ParserUtility {
 	 * @return formated date string
 	 * @throws ACAException
 	 */
-	public static String convertDateStringToPimoneyFormat(String dateString) throws Exception{
+	public static String convertToPimoneyDate(String dateString) throws Exception{
 
 		logger.info("inside convertDateStringToPimoneyFormat with only date string :: " + dateString);
 		Date newDate = null;

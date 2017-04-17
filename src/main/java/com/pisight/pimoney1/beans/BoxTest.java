@@ -11,8 +11,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.TextPosition;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 
 public class BoxTest extends PDFTextStripper {
 
@@ -55,7 +55,7 @@ public class BoxTest extends PDFTextStripper {
 		this.pdDocument = 	PDDocument.load(file);
 	}
 	
-	public BoxTest(String file) throws Exception{
+	/*public BoxTest(String file) throws Exception{
 
 		if(StringUtils.isEmpty(file)){
 
@@ -65,7 +65,7 @@ public class BoxTest extends PDFTextStripper {
 		}
 
 		this.pdDocument = 	PDDocument.load(file);
-	}
+	}*/
 
 	public BoxTest(File file, String password) throws Exception{
 
@@ -77,15 +77,15 @@ public class BoxTest extends PDFTextStripper {
 		}
 
 
-		this.pdDocument = 	PDDocument.load(file);
+		this.pdDocument = 	PDDocument.load(file, password);
 
-		pdDocument.setAllSecurityToBeRemoved(true);
+		/*pdDocument.setAllSecurityToBeRemoved(true);
 
 		if(pdDocument.isEncrypted()){
 			System.out.println("pdf encrypted");
 			StandardDecryptionMaterial sdm = new StandardDecryptionMaterial(password);
 			pdDocument.openProtection(sdm);
-		}
+		}*/
 	}
 
 

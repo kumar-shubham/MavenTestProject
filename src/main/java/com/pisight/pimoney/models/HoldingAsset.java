@@ -43,6 +43,7 @@ public class HoldingAsset {
 	private String  holdingAssetCommencingDate;
 	private String  holdingAssetCoupon;
 	private String  holdingAssetStrikePrice;
+	private String  holdingAssetInterestTillMaturity;
 	private String  fingerprint;
 	
 	private HashMap<String, String> properties = new HashMap<String, String>();
@@ -494,6 +495,20 @@ public class HoldingAsset {
 	public void setHoldingAssetStrikePrice(String holdingAssetStrikePrice) {
 		if(StringUtils.isNotEmpty(holdingAssetStrikePrice)){
 			this.holdingAssetStrikePrice = holdingAssetStrikePrice;
+		}
+	}
+	/**
+	 * @return the holdingAssetInterestTillMaturity
+	 */
+	public String getHoldingAssetInterestTillMaturity() {
+		return holdingAssetInterestTillMaturity;
+	}
+	/**
+	 * @param holdingAssetInterestTillMaturity the holdingAssetInterestTillMaturity to set
+	 */
+	public void setHoldingAssetInterestTillMaturity(String holdingAssetInterestTillMaturity) {
+		if(StringUtils.isNotEmpty(holdingAssetInterestTillMaturity)){
+			this.holdingAssetInterestTillMaturity = holdingAssetInterestTillMaturity;
 		}
 	}
 	/**

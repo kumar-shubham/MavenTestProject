@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.TextPosition;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
+
 
 
 public class PDFExtracter extends PDFTextStripper {
@@ -39,6 +39,10 @@ public class PDFExtracter extends PDFTextStripper {
 	private String haltText = null;
 
 	private String prevText = null;
+	
+	private int pageNum = 0;
+	
+	private int totalPage = 0;
 
 
 	public PDFExtracter(File file) throws Exception{
@@ -71,16 +75,8 @@ public class PDFExtracter extends PDFTextStripper {
 
 		}
 
+		this.pdDocument = 	PDDocument.load(file, password);
 
-		this.pdDocument = 	PDDocument.load(file);
-
-		pdDocument.setAllSecurityToBeRemoved(true);
-
-		if(pdDocument.isEncrypted()){
-			System.out.println("pdf encrypted");
-			StandardDecryptionMaterial sdm = new StandardDecryptionMaterial(password);
-			pdDocument.openProtection(sdm);
-		}
 	}
 	
 	
@@ -101,6 +97,8 @@ public class PDFExtracter extends PDFTextStripper {
 
 		return convertPDFToHTML(wordSeparator, null, null, null, null, null, null);
 	}
+	
+	
 	
 	
 	private String convertPDFToTextOrHTML(String wordSeparator, String regex, String startText, String endText, String markerText, String haltText, String prevText) throws Exception{
@@ -173,6 +171,9 @@ public class PDFExtracter extends PDFTextStripper {
 		textStripper.setWordSeparator(wordSeparator);
 
 		textStripper.setLineSeparator(LINE_SEPARATOR);
+		
+		textStripper.setStartPage(pageNum);
+		textStripper.setEndPage(pageNum);
 
 
 		if(null == this.pdDocument){
@@ -194,13 +195,21 @@ public class PDFExtracter extends PDFTextStripper {
 		// TODO Auto-generated method stub
 		long methodStartTime = System.currentTimeMillis();
 		long methodEndTime = 0l;
-
-		String htmlCode = TABLE_OPENING + convertPDFToTextOrHTML(wordSeparator, regex, startText, endText, markerText, haltText, prevText) + TABLE_CLOSING;
+		
+		String htmlCode = "";
+//		String htmlCode = TABLE_OPENING + convertPDFToTextOrHTML(wordSeparator, regex, startText, endText, markerText, haltText, prevText) + TABLE_CLOSING;
+	    totalPage = getNumberOfPages();
 	    
+		for(int i = 1; i<= totalPage; i++){
+			pageNum = i;
+			htmlCode = htmlCode +  convertPDFToTextOrHTML(wordSeparator, regex, startText, endText, markerText, haltText, prevText) + LINE_SEPARATOR;
+		}
+		
+		htmlCode = TABLE_OPENING + htmlCode + TABLE_CLOSING;
 		
 		LOGGER.info("################################################################");
 		System.out.println(htmlCode);
-		LOGGER.info("################################################################");
+//		LOGGER.info("################################################################");
 		String escapedJavaScripthtmlCode= StringEscapeUtils.escapeEcmaScript(htmlCode);
 		StringBuilder sb = new StringBuilder();
 		sb.append("var newHTML         = document.createElement ('table');");
