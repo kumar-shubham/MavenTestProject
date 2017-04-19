@@ -4,16 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -27,15 +23,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pisight.pimoney.beans.ParserUtility;
 import com.pisight.pimoney.constants.Constants;
-import com.pisight.pimoney.models.BankAccount;
-import com.pisight.pimoney.models.BankTransaction;
-import com.pisight.pimoney.models.HoldingAsset;
 import com.pisight.pimoney.models.InvestmentAccount;
 import com.pisight.pimoney.models.Response;
 
 public class MyClass {
 
-	private static Logger logger = Logger.getLogger(MyClass.class);
+//	private static Logger logger = Logger.getLogger(MyClass.class);
 
 
 	public static void main(String[] args) throws Exception {
@@ -49,7 +42,7 @@ public class MyClass {
 
 		PDFExtracter boxTest = null;
 		try{
-			boxTest = new PDFExtracter(getFile("investments/new3", "BNP HK trans", "pdf"),"");
+			boxTest = new PDFExtracter(getFile("investments", "PL DB Portfolio June 2015", "pdf"),"");
 		}catch(Exception e){
 			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
 				System.out.println("Cannot decrypt PDF, the password is incorrect");
@@ -80,7 +73,7 @@ public class MyClass {
 
 		String fileName = dir + "/" + name + "." + type.toLowerCase();
 
-		Path p = Paths.get(System.getProperty("user.home"), "Downloads/statements/statements", fileName);
+		Path p = Paths.get(System.getProperty("user.home"), "kumar/statements/statements", fileName);
 
 		return p.toFile();
 	}
@@ -134,123 +127,85 @@ public class MyClass {
 		System.out.println("#@#@#@#@##@#@##@#@#@##@#@#@#@#@##@#@#@#@#@#@##@#@#@#@#");
 		System.out.println("");
 
-		WebElement page = driver.findElement(By.id("PDF_TO_HTML"));
+		WebElement accountEle = driver.findElement(By.xpath("//td[contains(text(), 'Portfolio No/Ref. CCY:')]"));
 		
-		WebElement refrenceCurrencyEle = page.findElement(By.xpath("//td[contains(text(), 'REFERENCE CURRENCY ')]"));
-		String refrenceCurrencyArray[] = refrenceCurrencyEle.getText().trim().split(" ");
-		String refrenceCurrency = refrenceCurrencyArray[2];
+		String accountText = accountEle.getText().trim();
 		
-		WebElement stmtDateEle = page.findElement(By.xpath("//td[contains(text(), 'From ')]"));
-		String stmtDate[] = stmtDateEle.getText().trim().split("till");
-		String statementDate = stmtDate[1].trim();
-		System.out.println("Statement Date = " + statementDate);
+		String accRegex = ".*Portfolio No/Ref. CCY: (\\d{6,10}) ?/  ?([A-Z]{3}).*Relationship Manager: (.*)";
+		Pattern pAcc = Pattern.compile(accRegex);
+		Matcher mAcc = pAcc.matcher(accountText);
 		
-
-		String transactionRegex = "(\\d{2}.\\d{2}.\\d{4}) (.*) (\\d{2}.\\d{2}.\\d{4}) (-?(\\d*,)*\\d+(.)\\d+)( -?(\\d*,)*\\d+(.)\\d+)?";
-		String accountRegex = "((?:\\*|\\d){7}-\\d{3}-\\d{3}-\\d{3}) (.*)";
-
-		Pattern accountRegEx = Pattern.compile(accountRegex);
-		Pattern transactionRegEx = Pattern.compile(transactionRegex);
-		Matcher accountMatcher = null;
-		Matcher txnMatched = null;
-		boolean accountFlag = false;
-
-		List<BankAccount> accounts = new ArrayList<BankAccount>();
-
-		List<WebElement> trEles = driver.findElements(By.tagName("tr"));
-		BankAccount currentAcct = null;
-		BankTransaction lastTransaction = null;
-		boolean isTransactionTable = false;
-
-		for(WebElement rowEle: trEles){
-
-			String rowText = rowEle.getText().trim();
-			System.out.println("rowtext ::: " + rowText); 
-			accountMatcher = accountRegEx.matcher(rowText);
-			txnMatched = transactionRegEx.matcher(rowText);
-
-			if(!accountFlag && accountMatcher.matches()){
-				String accountNumber = accountMatcher.group(1).replace("-", "");
-				String accountName = accountMatcher.group(2);
-				String accountCurrencyDetails[] = accountName.split("-");
-				String accountCurrency = accountCurrencyDetails[1];
-				accountCurrency = currencyMap.get(accountCurrency.trim());
-				if(StringUtils.isEmpty(accountCurrency)){
-					accountCurrency = refrenceCurrency;
-				}
-
-				BankAccount ba = new BankAccount(properties);
-				ba.setAccountName(accountName);
-				ba.setAccountNumber(accountNumber);
-				ba.setCurrency(accountCurrency);
-				ba.setBillDate(ParserUtility.convertToPimoneyDate(statementDate));
-				currentAcct = ba;
-
-				accountFlag = true;
-				isTransactionTable = true;
-
-			}else{
-
-				if(rowText.contains("CLOSING BALANCE")){                    
-					String splits[] = rowText.split(" ");
-					String accountBalance = splits[3].replaceAll(",", "");
-					currentAcct.setAccountBalance(accountBalance);
-					accounts.add(currentAcct);
-					response.addBankAccount(currentAcct);
-					accountFlag = false;
-					isTransactionTable = false;
-					currentAcct = null;
-
-				}else if(txnMatched.matches() && currentAcct != null){
-
-					String txnDate = txnMatched.group(1);
-					String desc = txnMatched.group(2);
-					String balance = txnMatched.group(4).replaceAll(",", "");
-
-					String transType = null;
-					if(balance.contains("-")){
-						transType = BankTransaction.TRANSACTION_TYPE_DEBIT;
-					}else{
-						transType = BankTransaction.TRANSACTION_TYPE_CREDIT;
-					}
-
-					BankTransaction bt = new BankTransaction();
-					bt.setAmount(balance);
-					bt.setDescription(desc);
-					bt.setTransDate(ParserUtility.convertToPimoneyDate(txnDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YYYY));
-					bt.setTransactionType(transType);
-					bt.setCurrency(currentAcct.getCurrency());
-					bt.setAccountNumber(currentAcct.getAccountNumber());
-					currentAcct.addTransaction(bt);
-					lastTransaction = bt;
-
-					isTransactionTable = true;
-
-					System.out.println("Transaction = " +  "  " + txnDate + "  "+ desc +"  "+ balance +"  "+ transType);
-
-				}else if(lastTransaction != null){
-
-					if(rowText.contains("Page")){
-						isTransactionTable = false;
-						continue;
-					}else if(rowText.contains("Value Date")){
-						isTransactionTable = true;
-						continue;
-					}else if(rowText.contains("OPENING BALANCE")){
-						continue;
-					}
-
-					if(isTransactionTable){
-						lastTransaction.setDescription(lastTransaction.getDescription() + " " + rowText);
-					}
-				}
-			}
+		String accountNumber = null;
+		String currency = null;
+		String rm = null;
+		if(mAcc.matches()){
+			accountNumber = mAcc.group(1);
+			currency = mAcc.group(2);
+			rm = mAcc.group(3);
 		}
+		else{
+			throw new Exception("PDF format is changed. Need to handle");
+		}
+		
+		WebElement stmtDateEle = driver.findElement(By.xpath("//td[contains(text(), 'As of')]"));
+		String stmtDate = stmtDateEle.getText().trim();
+		
+		String stmtRegex = ".*As of (\\d{1,2}\\.\\d{2}\\.\\d{2}).*";
+		Pattern pStmt = Pattern.compile(stmtRegex);
+		Matcher mStmt = pStmt.matcher(stmtDate);
+		
+		
+		if(mStmt.matches()){
+			stmtDate = mStmt.group(1);
+		}
+		else{
+			throw new Exception("PDF format is changed. Need to handle");
+		}
+		
+		String balanceIdentifier = "Market Value at " + stmtDate;
+		String balanceXpath = "//td[contains(text(), '" + balanceIdentifier + "')]";
+		WebElement balanceEle = driver.findElement(By.xpath(balanceXpath));
+		String balance = balanceEle.getText().trim();
+		
+		String balRegex = ".*" + balanceIdentifier + " (-?(?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+		Pattern pBal = Pattern.compile(balRegex);
+		Matcher mBal = pBal.matcher(balance);
+		
+		if(mBal.matches()){
+			balance = mBal.group(1);
+		}
+		else{
+			throw new Exception("PDF format is changed. Need to handle");
+		}
+		
+		System.out.println("Account Number -> " + accountNumber);
+		System.out.println("Currency -> " + currency);
+		System.out.println("Manager -> " + rm);
+		System.out.println("Stmt Date -> " + stmtDate);
+		System.out.println("Balance -> " + balance);
+		
+		
+		
+		InvestmentAccount account = new InvestmentAccount(properties);
+		account.setAccountNumber(accountNumber);
+		account.setCurrency(currency);
+		account.setRelationshipManager(rm);
+		account.setBillDate(ParserUtility.convertToPimoneyDate(stmtDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
+		account.setBalance(ParserUtility.formatAmount(balance));
+		account.setAvailableBalance(ParserUtility.formatAmount(balance));
+		
+		getAssetType1(driver, account);
+		getAssetType2(driver, account);
+		getAssetType3(driver, account);
+		getAssetType4(driver, account);
+		getAssetType5(driver, account);
+		
+		
 
 		ObjectMapper mapper = new ObjectMapper();
 		Path p = Paths.get(System.getProperty("user.home"), "Documents", "bankStmt.json");
 		try {
-			mapper.writeValue(new File(p.toString()), accounts);
+			mapper.writeValue(new File(p.toString()), account);
 			//			String x = mapper.writeValueAsString(accounts);
 			//			JSONObject json = mapper.readValue(new File(p.toString()), JSONObject.class);
 			//			String xml = XML.toString(json);
@@ -265,6 +220,50 @@ public class MyClass {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private static void getAssetType1(WebDriver driver, InvestmentAccount account) {
+		// TODO Auto-generated method stub
+		
+		String regex = "";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = null;
+		
+		String xpath = "//tr[preceding-sibling::tr/td[text() = 'List of Holdings - Cash Positions'] and following-sibling::tr/td[contains(text() , 'Total Cash Positions')]]";
+		List<WebElement> rows = driver.findElements(By.xpath(xpath));
+		
+		for(WebElement row: rows){
+			
+			String rowText = row.getText().trim();
+			System.out.println("Row Text -1->> " + rowText);
+			
+			m = p.matcher(rowText);
+			
+			if(m.matches()){
+				
+			}
+		}
+		
+	}
+	
+	private static void getAssetType2(WebDriver driver, InvestmentAccount account) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private static void getAssetType3(WebDriver driver, InvestmentAccount account) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private static void getAssetType4(WebDriver driver, InvestmentAccount account) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private static void getAssetType5(WebDriver driver, InvestmentAccount account) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
