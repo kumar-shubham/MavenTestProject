@@ -11,6 +11,21 @@ public class HoldingAsset {
 	
 	private static Logger logger = Logger.getLogger(HoldingAsset.class);
 	
+	// Constants for Asset Categories
+	
+	public static final String CATEGORY_LOAN = "Loan";
+	public static final String CATEGORY_CASH = "Cash";
+	public static final String CATEGORY_BOND = "Bond";
+	public static final String CATEGORY_EQUITY = "Equity";
+	public static final String CATEGORY_DEPOSIT = "Deposit";
+	public static final String CATEGORY_COMMODITY = "Commodity";
+	public static final String CATEGORY_ALTERNATE_ASSET = "Alternate Asset";
+	public static final String CATEGORY_UNIT_TRUST__MUTUAL_FUND = "Unit Trust / Mutual Fund";
+	public static final String CATEGORY_ALTERNATE_TRADING_STRATEGY = "Alternate Trading Strategy";
+	public static final String CATEGORY_MULTI_ASSET__STRUCTURED_NOTES = "Multi Asset Class / Structured Notes";
+	public static final String CATEGORY_PRIVATE_EQUITY__HEDGE_N_OTHER_FUND = "Private Equity, Hedge Fund and Other Fund";
+	public static final String CATEGORY_MONEY_MARKET_N_DISCOUNTED_INSTRUMENT = "Money Market and Discounted Instrument";
+	
 	private String  holdingAssetAccountNumber;
 	private String  holdingAssetSubAccountNumber;
 	private String  holdingAssetSecurityId;
@@ -19,7 +34,7 @@ public class HoldingAsset {
 	private String  holdingAssetCategory;
 	private String  holdingAssetSubCategory;
 	private String  holdingAssetCurrency;
-	private String  holdingAssetBondYield;
+	private String  holdingAssetYield;
 	private String  holdingAssetQuantity;
 	private String  holdingAssetAverageUnitCost;
 	private String  holdingAssetIndicativePrice;
@@ -29,16 +44,15 @@ public class HoldingAsset {
 	private String  holdingAssetProfit;
 	private String  holdingAssetProfitPerc;
 	private String  holdingAssetCustodian;
-	private String  holdingAssetBondCoupon;
-	private String  holdingAssetBondMaturityDate;
-	private String  holdingAssetBondIssuer;
+	private String  holdingAssetMaturityDate;
+	private String  holdingAssetIssuer;
 	private String  holdingAssetAccruedInterest;
 	private String  holdingAssetLastFxRate;
 	private String  holdingAssetFxAccruredInterest;
 	private String  holdingAssetStartDate;
 	private String  holdingAssetFxMarketValue;
 	private String  holdingAssetUnrealizedProfitLoss;
-	private String  holdingAssetNotional;
+	private String  holdingAssetUnrealizedProfitLossCurrency;
 	private String  holdingAssetISIN;
 	private String  holdingAssetCommencingDate;
 	private String  holdingAssetCoupon;
@@ -46,7 +60,25 @@ public class HoldingAsset {
 	private String  holdingAssetInterestTillMaturity;
 	private String  fingerprint;
 	
+	private boolean bondNature = false;
+	
 	private HashMap<String, String> properties = new HashMap<String, String>();
+	
+	public boolean isBondNature() {
+		return bondNature;
+	}
+	/**
+	 * @return the bondNature
+	 */
+	public boolean hasBondNature() {
+		return bondNature;
+	}
+	/**
+	 * @param bondNature the bondNature to set
+	 */
+	public void setBondNature(boolean bondNature) {
+		this.bondNature = bondNature;
+	}
 	
 	/**
 	 * @return the holdingAssetAccountNumber
@@ -59,7 +91,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetAccountNumber(String holdingAssetAccountNumber) {
 		if(StringUtils.isNotEmpty(holdingAssetAccountNumber)){
-			this.holdingAssetAccountNumber = holdingAssetAccountNumber;
+			this.holdingAssetAccountNumber = holdingAssetAccountNumber.trim();
 		}
 	}
 	/**
@@ -73,7 +105,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetSubAccountNumber(String holdingAssetSubAccountNumber) {
 		if(StringUtils.isNotEmpty(holdingAssetSubAccountNumber)){
-			this.holdingAssetSubAccountNumber = holdingAssetSubAccountNumber;
+			this.holdingAssetSubAccountNumber = holdingAssetSubAccountNumber.trim();
 		}
 	}
 	/**
@@ -87,7 +119,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetSecurityId(String holdingAssetSecurityId) {
 		if(StringUtils.isNotEmpty(holdingAssetSecurityId)){
-			this.holdingAssetSecurityId = holdingAssetSecurityId;
+			this.holdingAssetSecurityId = holdingAssetSecurityId.trim();
 		}
 	}
 	/**
@@ -101,7 +133,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetName(String holdingAssetName) {
 		if(StringUtils.isNotEmpty(holdingAssetName)){
-			this.holdingAssetName = holdingAssetName;
+			this.holdingAssetName = holdingAssetName.trim();
 		}
 	}
 	/**
@@ -115,7 +147,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetDescription(String holdingAssetDescription) {
 		if(StringUtils.isNotEmpty(holdingAssetDescription)){
-			this.holdingAssetDescription = holdingAssetDescription;
+			this.holdingAssetDescription = holdingAssetDescription.trim();
 		}
 	}
 	/**
@@ -129,7 +161,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetCategory(String holdingAssetCategory) {
 		if(StringUtils.isNotEmpty(holdingAssetCategory)){
-			this.holdingAssetCategory = holdingAssetCategory;
+			this.holdingAssetCategory = holdingAssetCategory.trim();
 		}
 	}
 	/**
@@ -143,7 +175,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetSubCategory(String holdingAssetSubCategory) {
 		if(StringUtils.isNotEmpty(holdingAssetSubCategory)){
-			this.holdingAssetSubCategory = holdingAssetSubCategory;
+			this.holdingAssetSubCategory = holdingAssetSubCategory.trim();
 		}
 	}
 	/**
@@ -157,21 +189,21 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetCurrency(String holdingAssetCurrency) {
 		if(StringUtils.isNotEmpty(holdingAssetCurrency)){
-			this.holdingAssetCurrency = holdingAssetCurrency;
+			this.holdingAssetCurrency = holdingAssetCurrency.trim().trim();
 		}
 	}
 	/**
-	 * @return the holdingAssetBondYield
+	 * @return the holdingAssetYield
 	 */
-	public String getHoldingAssetBondYield() {
-		return holdingAssetBondYield;
+	public String getHoldingAssetYield() {
+		return holdingAssetYield;
 	}
 	/**
-	 * @param holdingAssetBondYield the holdingAssetBondYield to set
+	 * @param holdingAssetYield the holdingAssetYield to set
 	 */
-	public void setHoldingAssetBondYield(String holdingAssetBondYield) {
-		if(StringUtils.isNotEmpty(holdingAssetBondYield)){
-			this.holdingAssetBondYield = holdingAssetBondYield;
+	public void setHoldingAssetYield(String holdingAssetYield) {
+		if(StringUtils.isNotEmpty(holdingAssetYield)){
+			this.holdingAssetYield = holdingAssetYield.trim();
 		}
 	}
 	/**
@@ -185,7 +217,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetQuantity(String holdingAssetQuantity) {
 		if(StringUtils.isNotEmpty(holdingAssetQuantity)){
-			this.holdingAssetQuantity = holdingAssetQuantity;
+			this.holdingAssetQuantity = holdingAssetQuantity.trim();
 		}
 	}
 	/**
@@ -199,7 +231,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetAverageUnitCost(String holdingAssetAverageUnitCost) {
 		if(StringUtils.isNotEmpty(holdingAssetAverageUnitCost)){
-			this.holdingAssetAverageUnitCost = holdingAssetAverageUnitCost;
+			this.holdingAssetAverageUnitCost = holdingAssetAverageUnitCost.trim();
 		}
 	}
 	/**
@@ -213,7 +245,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetIndicativePrice(String holdingAssetIndicativePrice) {
 		if(StringUtils.isNotEmpty(holdingAssetIndicativePrice)){
-			this.holdingAssetIndicativePrice = holdingAssetIndicativePrice;
+			this.holdingAssetIndicativePrice = holdingAssetIndicativePrice.trim();
 		}
 	}
 	/**
@@ -227,7 +259,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetCost(String holdingAssetCost) {
 		if(StringUtils.isNotEmpty(holdingAssetCost)){
-			this.holdingAssetCost = holdingAssetCost;
+			this.holdingAssetCost = holdingAssetCost.trim();
 		}
 	}
 	/**
@@ -241,7 +273,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetCurrentValue(String holdingAssetCurrentValue) {
 		if(StringUtils.isNotEmpty(holdingAssetCurrentValue)){
-			this.holdingAssetCurrentValue = holdingAssetCurrentValue;
+			this.holdingAssetCurrentValue = holdingAssetCurrentValue.trim();
 		}
 	}
 	/**
@@ -255,7 +287,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetIndicativePriceDate(String holdingAssetIndicativePriceDate) {
 		if(StringUtils.isNotEmpty(holdingAssetIndicativePriceDate)){
-			this.holdingAssetIndicativePriceDate = holdingAssetIndicativePriceDate;
+			this.holdingAssetIndicativePriceDate = holdingAssetIndicativePriceDate.trim();
 		}
 	}
 	/**
@@ -269,7 +301,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetProfit(String holdingAssetProfit) {
 		if(StringUtils.isNotEmpty(holdingAssetProfit)){
-			this.holdingAssetProfit = holdingAssetProfit;
+			this.holdingAssetProfit = holdingAssetProfit.trim();
 		}
 	}
 	/**
@@ -283,7 +315,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetProfitPerc(String holdingAssetProfitPerc) {
 		if(StringUtils.isNotEmpty(holdingAssetProfitPerc)){
-			this.holdingAssetProfitPerc = holdingAssetProfitPerc;
+			this.holdingAssetProfitPerc = holdingAssetProfitPerc.trim();
 		}
 	}
 	/**
@@ -297,49 +329,36 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetCustodian(String holdingAssetCustodian) {
 		if(StringUtils.isNotEmpty(holdingAssetCustodian)){
-			this.holdingAssetCustodian = holdingAssetCustodian;
+			this.holdingAssetCustodian = holdingAssetCustodian.trim();
+		}
+	}
+	
+	/**
+	 * @return the holdingAssetMaturityDate
+	 */
+	public String getHoldingAssetMaturityDate() {
+		return holdingAssetMaturityDate;
+	}
+	/**
+	 * @param holdingAssetMaturityDate the holdingAssetMaturityDate to set
+	 */
+	public void setHoldingAssetMaturityDate(String holdingAssetMaturityDate) {
+		if(StringUtils.isNotEmpty(holdingAssetMaturityDate)){
+			this.holdingAssetMaturityDate = holdingAssetMaturityDate.trim();
 		}
 	}
 	/**
-	 * @return the holdingAssetBondCoupon
+	 * @return the holdingAssetIssuer
 	 */
-	public String getHoldingAssetBondCoupon() {
-		return holdingAssetBondCoupon;
+	public String getHoldingAssetIssuer() {
+		return holdingAssetIssuer;
 	}
 	/**
-	 * @param holdingAssetBondCoupon the holdingAssetBondCoupon to set
+	 * @param holdingAssetIssuer the holdingAssetIssuer to set
 	 */
-	public void setHoldingAssetBondCoupon(String holdingAssetBondCoupon) {
-		if(StringUtils.isNotEmpty(holdingAssetBondCoupon)){
-			this.holdingAssetBondCoupon = holdingAssetBondCoupon;
-		}
-	}
-	/**
-	 * @return the holdingAssetBondMaturityDate
-	 */
-	public String getHoldingAssetBondMaturityDate() {
-		return holdingAssetBondMaturityDate;
-	}
-	/**
-	 * @param holdingAssetBondMaturityDate the holdingAssetBondMaturityDate to set
-	 */
-	public void setHoldingAssetBondMaturityDate(String holdingAssetBondMaturityDate) {
-		if(StringUtils.isNotEmpty(holdingAssetBondMaturityDate)){
-			this.holdingAssetBondMaturityDate = holdingAssetBondMaturityDate;
-		}
-	}
-	/**
-	 * @return the holdingAssetBondIssuer
-	 */
-	public String getHoldingAssetBondIssuer() {
-		return holdingAssetBondIssuer;
-	}
-	/**
-	 * @param holdingAssetBondIssuer the holdingAssetBondIssuer to set
-	 */
-	public void setHoldingAssetBondIssuer(String holdingAssetBondIssuer) {
-		if(StringUtils.isNotEmpty(holdingAssetBondIssuer)){
-			this.holdingAssetBondIssuer = holdingAssetBondIssuer;
+	public void setHoldingAssetIssuer(String holdingAssetIssuer) {
+		if(StringUtils.isNotEmpty(holdingAssetIssuer)){
+			this.holdingAssetIssuer = holdingAssetIssuer.trim();
 		}
 	}
 	/**
@@ -353,7 +372,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetAccruedInterest(String holdingAssetAccruedInterest) {
 		if(StringUtils.isNotEmpty(holdingAssetAccruedInterest)){
-			this.holdingAssetAccruedInterest = holdingAssetAccruedInterest;
+			this.holdingAssetAccruedInterest = holdingAssetAccruedInterest.trim();
 		}
 	}
 	/**
@@ -367,7 +386,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetLastFxRate(String holdingAssetLastFxRate) {
 		if(StringUtils.isNotEmpty(holdingAssetLastFxRate)){
-			this.holdingAssetLastFxRate = holdingAssetLastFxRate;
+			this.holdingAssetLastFxRate = holdingAssetLastFxRate.trim();
 		}
 	}
 	/**
@@ -381,7 +400,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetFxAccruredInterest(String holdingAssetFxAccruredInterest) {
 		if(StringUtils.isNotEmpty(holdingAssetFxAccruredInterest)){
-			this.holdingAssetFxAccruredInterest = holdingAssetFxAccruredInterest;
+			this.holdingAssetFxAccruredInterest = holdingAssetFxAccruredInterest.trim();
 		}
 	}
 	/**
@@ -395,7 +414,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetStartDate(String holdingAssetStartDate) {
 		if(StringUtils.isNotEmpty(holdingAssetStartDate)){
-			this.holdingAssetStartDate = holdingAssetStartDate;
+			this.holdingAssetStartDate = holdingAssetStartDate.trim();
 		}
 	}
 	/**
@@ -409,7 +428,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetFxMarketValue(String holdingAssetFxMarketValue) {
 		if(StringUtils.isNotEmpty(holdingAssetFxMarketValue)){
-			this.holdingAssetFxMarketValue = holdingAssetFxMarketValue;
+			this.holdingAssetFxMarketValue = holdingAssetFxMarketValue.trim();
 		}
 	}
 	/**
@@ -423,21 +442,21 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetUnrealizedProfitLoss(String holdingAssetUnrealizedProfitLoss) {
 		if(StringUtils.isNotEmpty(holdingAssetUnrealizedProfitLoss)){
-			this.holdingAssetUnrealizedProfitLoss = holdingAssetUnrealizedProfitLoss;
+			this.holdingAssetUnrealizedProfitLoss = holdingAssetUnrealizedProfitLoss.trim();
 		}
 	}
 	/**
-	 * @return the holdingAssetNotional
+	 * @return the holdingAssetUnrealizedProfitLossCurrency
 	 */
-	public String getHoldingAssetNotional() {
-		return holdingAssetNotional;
+	public String getHoldingAssetUnrealizedProfitLossCurrency() {
+		return holdingAssetUnrealizedProfitLossCurrency;
 	}
 	/**
-	 * @param holdingAssetNotional the holdingAssetNotional to set
+	 * @param holdingAssetUnrealizedProfitLossCurrency the holdingAssetUnrealizedProfitLossCurrency to set
 	 */
-	public void setHoldingAssetNotional(String holdingAssetNotional) {
-		if(StringUtils.isNotEmpty(holdingAssetNotional)){
-			this.holdingAssetNotional = holdingAssetNotional;
+	public void setHoldingAssetUnrealizedProfitLossCurrency(String holdingAssetUnrealizedProfitLossCurrency) {
+		if(StringUtils.isNotEmpty(holdingAssetUnrealizedProfitLossCurrency)){
+			this.holdingAssetUnrealizedProfitLossCurrency = holdingAssetUnrealizedProfitLossCurrency.trim();
 		}
 	}
 	/**
@@ -451,7 +470,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetISIN(String holdingAssetISIN) {
 		if(StringUtils.isNotEmpty(holdingAssetISIN)){
-			this.holdingAssetISIN = holdingAssetISIN;
+			this.holdingAssetISIN = holdingAssetISIN.trim();
 		}
 	}
 	/**
@@ -465,7 +484,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetCommencingDate(String holdingAssetCommencingDate) {
 		if(StringUtils.isNotEmpty(holdingAssetCommencingDate)){
-			this.holdingAssetCommencingDate = holdingAssetCommencingDate;
+			this.holdingAssetCommencingDate = holdingAssetCommencingDate.trim();
 		}
 	}
 	/**
@@ -479,7 +498,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetCoupon(String holdingAssetCoupon) {
 		if(StringUtils.isNotEmpty(holdingAssetCoupon)){
-			this.holdingAssetCoupon = holdingAssetCoupon;
+			this.holdingAssetCoupon = holdingAssetCoupon.trim();
 		}
 	}
 	

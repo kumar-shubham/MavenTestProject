@@ -1,5 +1,6 @@
 package com.pisight.pimoney.beans;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -10,7 +11,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
+import org.json.simple.JSONObject;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pisight.pimoney.constants.Constants;
 import com.pisight.pimoney.models.BankAccount;
 import com.pisight.pimoney.models.BankTransaction;
@@ -436,6 +441,11 @@ public class ParserUtility {
 			account.setHash();
 
 		}
+	}
+
+	public static JSONObject convertToJSONObject(String string) throws JsonParseException, JsonMappingException, IOException{
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.readValue(string, JSONObject.class);
 	}
 }
 
