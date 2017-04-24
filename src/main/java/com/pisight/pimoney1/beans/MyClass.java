@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,8 +23,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pisight.pimoney.beans.ParserUtility;
 import com.pisight.pimoney.constants.Constants;
-import com.pisight.pimoney.models.BankAccount;
-import com.pisight.pimoney.models.BankTransaction;
+import com.pisight.pimoney.models.InvestmentAccount;
 import com.pisight.pimoney.models.Response;
 
 public class MyClass {
@@ -44,7 +42,7 @@ public class MyClass {
 
 		PDFExtracter boxTest = null;
 		try{
-			boxTest = new PDFExtracter(getFile("investments", "PL DB Portfolio June 2015 - TX", "pdf"),"");
+			boxTest = new PDFExtracter(getFile("investments", "lgt_inv_sg", "pdf"),"");
 		}catch(Exception e){
 			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
 				System.out.println("Cannot decrypt PDF, the password is incorrect");
@@ -120,6 +118,84 @@ public class MyClass {
 		
 		
 	}
+	
+//	accounts (liquidity)
+	private static String regex1 = "(\\d{7}\\.\\d{3}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{6}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex2 = "(.*) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})";
+	
+	Pattern p1 = Pattern.compile(regex1);
+	Pattern p2 = Pattern.compile(regex2);
+	
+//	fixed advances (credit)
+	private static String regex3 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) - (\\d{1,2}\\.\\d{2}\\.\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) % (-?(?:\\d*,)*\\d+\\.?\\d{6}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex4 = "(-?(?:\\d*,)*\\d+\\.?\\d{2}) (.*) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})";
+	
+	Pattern p3 = Pattern.compile(regex3);
+	Pattern p4 = Pattern.compile(regex4);
+	
+//	bonds
+	private static String regex5 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex6 = "(.*) (\\d{8,9}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{4}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})(?: .*)?";
+	private static String regex7 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})(?: .*)?";
+	
+	Pattern p5 = Pattern.compile(regex5);
+	Pattern p6 = Pattern.compile(regex6);
+	
+//	bond funds
+	private static String regex8 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) n.a. (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex9 = "(.*) (\\d{8,9}) n.a. (-?(?:\\d*,)*\\d+\\.?\\d{4})(?: .*)?";
+	private static String regex10 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})(?: .*)?";
+	
+	Pattern p7 = Pattern.compile(regex7);
+	Pattern p8 = Pattern.compile(regex8);
+	
+//	equities
+	private static String regex11 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex12 = "(.*) (\\d{6,9}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4})(?: .*)?";
+	private static String regex13 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})(?: .*)?";
+	
+//	structured products equities (equities)
+	private static String regex14 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (\\d{1,2}\\.\\d{2}\\.\\d{4}) n.a. (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex15 = "(.*) (\\d{6,9}) n.a. (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4})(?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})?(?: .*)?"";
+	private static String regex16 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})";
+	
+//	precious metal accounts (commodities/metals)
+	private static String regex17 = "(\\d{7}\\.\\d{3}) (-?(?:\\d*,)*\\d+\\.?\\d{3}) (-?(?:\\d*,)*\\d+\\.?\\d{6}) n.a. (?: )* (-?(?:\\d*,)*\\d+\\.?\\d{2}) n.a. (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	
+//	futures (Derivatives)
+	private static String regex18 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (?: )*n.a. (-?(?:\\d*,)*\\d+\\.?\\d{2}) % n.a. (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex19 = "(.*) (\\d{6,9}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4})(?: .*)?";
+	private static String regex20 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})(?: .*)?";
+	
+//	options (Derivatives)
+	private static String regex21 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex22 = "(.*) (\\d{6,9}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4})(?: .*)?";
+	private static String regex23 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})(?: .*)?";
+	
+//	OTC (Derivatives)
+	private static String regex24 = "(.*) ([A-Z]{3})/([A-Z]{3}) (call|put) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{5}) (-?(?:\\d*,)*\\d+\\.?\\d{5})";
+	private static String regex25 = "(.*) (-?(?:\\d*,)*\\d+\\.?\\d{5}) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})";
+	
+//	structured products
+	private static String regex26 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (\\d{1,2}\\.\\d{2}\\.\\d{4}) n.a. (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (?:\\w)?(?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) n.a. n.a. (-?(?:\\d*,)*\\d+\\.?\\d{2}) ";
+	private static String regex27 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (\\d{1,2}\\.\\d{2}\\.\\d{4}) n.a. (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) ";
+	private static String regex28 = "(.*) (\\d{6,9}) n.a.( -?(?:\\d*,)*\\d+\\.?\\d{4})? (-?(?:\\d*,)*\\d+\\.?\\d{4})(?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})?(?: .*)?";
+	private static String regex29 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})(?: .*)?";
+	
+//	other derivatives (Derivatives)
+	private static String regex30 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d*) (.*) (\\w{12}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (?:\\w)?(?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) % (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+	private static String regex31 = "(.*) (\\d{6,9}) (-?(?:\\d*,)*\\d+\\.?\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d{4})(?: .*)?";
+	private static String regex32 = "(.*) (\\d{1,2}\\.\\d{2}\\.\\d{4}) (\\d{1,2}\\.\\d{2}\\.\\d{4})(?: .*)?";
+	
+//	deliveries in/out
+	private static String regex33 = "(\\d{1,2}\\.\\d{2}\\.\\d{4}) (.*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d{4}) ([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{6}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})";
+	
+//	buys/sells
+	private static String regex34 = "(\\d{1,2}\\.\\d{2}\\.\\d{4}) (.*) (\\w{12}) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d{4}) ([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{6}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})";
+	private static String regex35 = "(.*) (\\d{6,9})";
+	
+	
+	
 
 	private static int rowCount = 0;
 	
@@ -131,195 +207,80 @@ public class MyClass {
 		System.out.println("#@#@#@#@##@#@##@#@#@##@#@#@#@#@##@#@#@#@#@#@##@#@#@#@#");
 		System.out.println("");
 
-		WebElement accountEle = driver.findElement(By.xpath("//td[contains(text(), 'Portfolio No/Ref. CCY:')]"));
+		WebElement accNumEle = driver.findElement(By.xpath("//td[contains(text(), 'client number:')]"));
+		String accNum = accNumEle.getText().trim();
 		
-		String accountText = accountEle.getText().trim();
+		String regex = ".*client number: (\\d{7}\\.\\d{3})( .*)?";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(accNum);
 		
-		String accRegex = ".*Portfolio No/Ref. CCY: (\\d{6,10}) ?/  ?([A-Z]{3}).*Relationship Manager: (.*)";
-		Pattern pAcc = Pattern.compile(accRegex);
-		Matcher mAcc = pAcc.matcher(accountText);
 		
-		String accountNumber = null;
-		String rm = null;
-		if(mAcc.matches()){
-			accountNumber = mAcc.group(1);
-			rm = mAcc.group(3);
-		}
-		else{
-			throw new Exception("PDF format is changed. Need to handle");
+		if(m.matches()){
+			accNum = m.group(1);
 		}
 		
-		WebElement stmtDateEle = driver.findElement(By.xpath("//td[contains(text(), 'As of')]"));
+		WebElement currencyEle = driver.findElement(By.xpath("//td[contains(text(), 'reference currency:')]"));
+		String currency = currencyEle.getText().trim();
+		
+		regex = ".*reference currency: ([A-Z]{3})( .*)?";
+		p = Pattern.compile(regex);
+		m = p.matcher(currency);
+		
+		if(m.matches()){
+			currency = m.group(1);
+		}
+		
+		WebElement stmtDateEle = driver.findElement(By.xpath("//td[contains(text(), 'statement of assets as of ')]"));
 		String stmtDate = stmtDateEle.getText().trim();
 		
-		String stmtRegex = ".*As of (\\d{1,2}\\.\\d{2}\\.\\d{2}).*";
-		Pattern pStmt = Pattern.compile(stmtRegex);
-		Matcher mStmt = pStmt.matcher(stmtDate);
+		regex = ".*statement of assets as of (\\d{1,2}\\.\\d{2}\\.\\d{4})( .*)?";
+		p = Pattern.compile(regex);
+		m = p.matcher(stmtDate);
 		
-		
-		if(mStmt.matches()){
-			stmtDate = mStmt.group(1);
-		}
-		else{
-			throw new Exception("PDF format is changed. Need to handle");
+		if(m.matches()){
+			stmtDate = m.group(1);
 		}
 		
+		String xpath = "//td[contains(text(), 'valuation of assets as at " + stmtDate + "')]";
+		WebElement balanceEle = driver.findElement(By.xpath(xpath));
+		String balance = balanceEle.getText().trim();
 		
-		System.out.println("Account Number -> " + accountNumber);
-		System.out.println("Manager -> " + rm);
-		System.out.println("Stmt Date -> " + stmtDate);
+		regex = ".*valuation of assets as at (?:\\d{1,2}\\.\\d{2}\\.\\d{4}) (?: )*(-?(?:\\d*,)*\\d+\\.?\\d{2})( .*)?";
+		p = Pattern.compile(regex);
+		m = p.matcher(balance);
 		
-		List<BankAccount> accounts  = new ArrayList<BankAccount>();
+		if(m.matches()){
+			balance = m.group(1);
+		}
 		
-		List<WebElement> rows = driver.findElements(By.tagName("tr"));
+		System.out.println(accNum);
+		System.out.println(currency);
+		System.out.println(stmtDate);
+		System.out.println(balance);
 		
-		String acctRegex = "([A-Z]{3}) (\\d{7,8}-\\d{3}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (\\d{1,2}\\.\\d{2}\\.\\d{2})( -?(?:\\d*,)*\\d+\\.?\\d{2})?( -?(?:\\d*,)*\\d+\\.?\\d{2})? (-?(?:\\d*,)*\\d+\\.?\\d{2}) (\\d{1,2}\\.\\d{2}\\.\\d{2}) \\d{1,2}";
-		String transRegex1 = "(\\d{1,2}\\.\\d{2}\\.\\d{2}) (\\d{1,2}\\.\\d{2}\\.\\d{2}) (.*) [A-Z] \\d{6,12} (-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2})";
-		String transRegex2 = "(\\d{1,2}\\.\\d{2}\\.\\d{2}) (\\d{1,2}\\.\\d{2}\\.\\d{2}) (.*) \\d{6,12} (-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2})";
-		String headerRegex = "[A-Z]{3} .* (\\d{7,8}-\\d{3}) Period from (\\d{1,2}\\.\\d{2}\\.\\d{2}) to (\\d{1,2}\\.\\d{2}\\.\\d{2})";
+		InvestmentAccount account = new InvestmentAccount(properties);
 		
-		Pattern pAcct = Pattern.compile(acctRegex);
-		Pattern pTrans1 = Pattern.compile(transRegex1);
-		Pattern pTrans2 = Pattern.compile(transRegex2);
-		Pattern pHeader = Pattern.compile(headerRegex);
-		Matcher mAcct = null;
-		Matcher mTrans1 = null;
-		Matcher mTrans2 = null;
-		Matcher mHeader = null;
+		account.setAccountNumber(accNum);
+		account.setBalance(ParserUtility.formatAmount(balance));
+		account.setAvailableBalance(ParserUtility.formatAmount(balance));
+		account.setCurrency(currency);
+		account.setBillDate(ParserUtility.convertToPimoneyDate(stmtDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YYYY));
+		account.setAccountName("Portfolio - " + currency);
 		
-		boolean isAccounts = false;
-		boolean isTransactions = false;
-		
-		String lastBalance = null;
-		BankTransaction currentTrans = null;
-		BankAccount currentAccount = null;
-		
-		HashMap<String, BankAccount> accountMap = new HashMap<String, BankAccount>();
+		List<WebElement> rows = driver.findElements(By.xpath("//tr[preceding-sibling::tr/td[contains(text(), 'accounts (liquidity)')]]"));
 		
 		for(WebElement row: rows){
+			
 			String rowText = row.getText().trim();
 			
-			System.out.println("RowText ->> " + rowText);
-			
-			if(rowText.contains("Cash Account Summary Report")){
-				isAccounts = true;
-				isTransactions = false;
-			}
-			else if(rowText.contains("Account Statement")){
-				isTransactions = true;
-				isAccounts = false;
-			}
-			
-			if(isAccounts){
-				mAcct = pAcct.matcher(rowText);
-				
-				if(mAcct.matches()){
-					String currency = mAcct.group(1);
-					String accNum = mAcct.group(2);
-					String balance = mAcct.group(7);
-					
-					BankAccount account = new BankAccount(properties);
-					
-					account.setAccountNumber(accNum);
-					account.setCurrency(currency);
-					account.setAccountBalance(ParserUtility.formatAmount(balance));
-					account.setBillDate(ParserUtility.convertToPimoneyDate(stmtDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
-					if(accountMap.get(accNum) == null){
-						accounts.add(account);
-						response.addBankAccount(account);
-						accountMap.put(accNum, account);
-					}
-					
-				}
-			}
-			else if(isTransactions){
-				
-				if(rowText.contains("Closing Balance") || rowText.contains("posted to your account") || rowText.contains("Portfolio No/Ref")){
-					System.out.println("Not a transaction row so skipping");
-					rowCount = 0;
-					currentTrans = null;
-					continue;
-				}
-				if(rowText.contains("Opening Balance")){
-					lastBalance = rowText.substring(rowText.lastIndexOf(" "));
-				}
-				else if(rowText.contains("Period from")){
-					mHeader = pHeader.matcher(rowText);
-					
-					if(mHeader.matches()){
-						String accountNum = mHeader.group(1);
-						currentAccount = accountMap.get(accountNum);
-					}
-				}
-				mTrans1 = pTrans1.matcher(rowText);
-				mTrans2 = pTrans2.matcher(rowText);
-				
-				Matcher m = null;
-				if(mTrans1.matches()){
-					m = mTrans1;
-				}
-				else if(mTrans2.matches()){
-					m = mTrans2;
-				}
-				
-				if(m != null && currentAccount != null){
-					rowCount = 1;
-					String valueDate = m.group(1);
-					String transDate = m.group(2);
-					String description = m.group(3);
-					String amount = m.group(4);
-					String runningBalance = m.group(5);
-					String type = null;
-					
-					runningBalance = ParserUtility.formatAmount(runningBalance);
-					lastBalance = ParserUtility.formatAmount(lastBalance);
-					
-					double runningBalanceD = Double.parseDouble(runningBalance);
-					double lastBalanceD = Double.parseDouble(lastBalance);
-					
-					if(runningBalanceD > lastBalanceD){
-						type = BankTransaction.TRANSACTION_TYPE_CREDIT;
-					}
-					else{
-						type = BankTransaction.TRANSACTION_TYPE_DEBIT;
-					}
-					
-					lastBalance = runningBalance;
-					
-					BankTransaction transaction = new BankTransaction();
-					
-					transaction.setAccountNumber(currentAccount.getAccountNumber());
-					transaction.setPostDate(ParserUtility.convertToPimoneyDate(valueDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
-					transaction.setTransDate(ParserUtility.convertToPimoneyDate(transDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY));
-					transaction.setDescription(description);
-					transaction.setAmount(ParserUtility.formatAmount(amount));
-					transaction.setTransactionType(type);
-					currentTrans = transaction;
-					currentAccount.addTransaction(transaction);
-					
-				}
-				else if(currentTrans != null && rowCount == 1){
-					String description = currentTrans.getDescription() + " " + rowText;
-					currentTrans.setDescription(description);
-					rowCount = 0;
-					currentTrans = null;
-				}
-				else{
-					rowCount = 0;
-				}
-			}
-			
+			System.out.println("RowText -> " + rowText);
 		}
-		
-		
-		
-		
 		
 
 		ObjectMapper mapper = new ObjectMapper();
-		Path p = Paths.get(System.getProperty("user.home"), "Documents", "bankStmt.json");
+		Path path = Paths.get(System.getProperty("user.home"), "Documents", "bankStmt.json");
 		try {
-			mapper.writeValue(new File(p.toString()), accounts);
+			mapper.writeValue(new File(path.toString()), account);
 			//			String x = mapper.writeValueAsString(accounts);
 			//			JSONObject json = mapper.readValue(new File(p.toString()), JSONObject.class);
 			//			String xml = XML.toString(json);
