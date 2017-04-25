@@ -58,6 +58,7 @@ public class HoldingAsset {
 	private String  holdingAssetCoupon;
 	private String  holdingAssetStrikePrice;
 	private String  holdingAssetInterestTillMaturity;
+	private String  holdingAssetOption;
 	private String  fingerprint;
 	
 	private boolean bondNature = false;
@@ -528,6 +529,20 @@ public class HoldingAsset {
 	public void setHoldingAssetInterestTillMaturity(String holdingAssetInterestTillMaturity) {
 		if(StringUtils.isNotEmpty(holdingAssetInterestTillMaturity)){
 			this.holdingAssetInterestTillMaturity = holdingAssetInterestTillMaturity;
+		}
+	}
+	/**
+	 * @return
+	 */
+	public String getHoldingAssetOption() {
+		return holdingAssetOption;
+	}
+	/**
+	 * @param holdingAssetOption
+	 */
+	public void setHoldingAssetOption(String holdingAssetOption) {
+		if(StringUtils.isNotEmpty(holdingAssetOption)){
+			this.holdingAssetOption = holdingAssetOption;
 		}
 	}
 	/**
