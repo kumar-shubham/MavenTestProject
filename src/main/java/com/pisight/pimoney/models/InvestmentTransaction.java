@@ -12,6 +12,9 @@ public class InvestmentTransaction extends TransactionBase{
 	public static final String TRANSACTION_TYPE_BUY = "Buy";
 	public static final String TRANSACTION_TYPE_SELL = "Sell";
 	public static final String TRANSACTION_TYPE_INCOME = "Income";
+	public static final String TRANSACTION_TYPE_EXPENSE = "Expense";
+	public static final String TRANSACTION_TYPE_INFLOW = "Inflow";
+	public static final String TRANSACTION_TYPE_OUTFLOW = "Outflow";
 	
 	
 	private String accountNumber = null;

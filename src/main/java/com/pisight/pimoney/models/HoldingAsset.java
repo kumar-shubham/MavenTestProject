@@ -1,5 +1,6 @@
 package com.pisight.pimoney.models;
 
+import java.text.ParseException;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -207,6 +208,12 @@ public class HoldingAsset {
 			this.holdingAssetYield = holdingAssetYield.trim();
 		}
 	}
+	
+	public void setHoldingAssetYield(String holdingAssetYield, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetYield)){
+			this.holdingAssetYield = ParserUtility.formatAmount(holdingAssetYield.trim());
+		}
+	}
 	/**
 	 * @return the holdingAssetQuantity
 	 */
@@ -219,6 +226,11 @@ public class HoldingAsset {
 	public void setHoldingAssetQuantity(String holdingAssetQuantity) {
 		if(StringUtils.isNotEmpty(holdingAssetQuantity)){
 			this.holdingAssetQuantity = holdingAssetQuantity.trim();
+		}
+	}
+	public void setHoldingAssetQuantity(String holdingAssetQuantity, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetQuantity)){
+			this.holdingAssetQuantity = ParserUtility.formatAmount(holdingAssetQuantity.trim());
 		}
 	}
 	/**
@@ -235,6 +247,11 @@ public class HoldingAsset {
 			this.holdingAssetAverageUnitCost = holdingAssetAverageUnitCost.trim();
 		}
 	}
+	public void setHoldingAssetAverageUnitCost(String holdingAssetAverageUnitCost, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetAverageUnitCost)){
+			this.holdingAssetAverageUnitCost = ParserUtility.formatAmount(holdingAssetAverageUnitCost.trim());
+		}
+	}
 	/**
 	 * @return the holdingAssetIndicativePrice
 	 */
@@ -247,6 +264,11 @@ public class HoldingAsset {
 	public void setHoldingAssetIndicativePrice(String holdingAssetIndicativePrice) {
 		if(StringUtils.isNotEmpty(holdingAssetIndicativePrice)){
 			this.holdingAssetIndicativePrice = holdingAssetIndicativePrice.trim();
+		}
+	}
+	public void setHoldingAssetIndicativePrice(String holdingAssetIndicativePrice, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetIndicativePrice)){
+			this.holdingAssetIndicativePrice = ParserUtility.formatAmount(holdingAssetIndicativePrice.trim());
 		}
 	}
 	/**
@@ -263,6 +285,11 @@ public class HoldingAsset {
 			this.holdingAssetCost = holdingAssetCost.trim();
 		}
 	}
+	public void setHoldingAssetCost(String holdingAssetCost, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetCost)){
+			this.holdingAssetCost = ParserUtility.formatAmount(holdingAssetCost.trim());
+		}
+	}
 	/**
 	 * @return the holdingAssetCurrentValue
 	 */
@@ -275,6 +302,11 @@ public class HoldingAsset {
 	public void setHoldingAssetCurrentValue(String holdingAssetCurrentValue) {
 		if(StringUtils.isNotEmpty(holdingAssetCurrentValue)){
 			this.holdingAssetCurrentValue = holdingAssetCurrentValue.trim();
+		}
+	}
+	public void setHoldingAssetCurrentValue(String holdingAssetCurrentValue, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetCurrentValue)){
+			this.holdingAssetCurrentValue = ParserUtility.formatAmount(holdingAssetCurrentValue.trim());
 		}
 	}
 	/**
@@ -291,6 +323,12 @@ public class HoldingAsset {
 			this.holdingAssetIndicativePriceDate = holdingAssetIndicativePriceDate.trim();
 		}
 	}
+	
+	public void setHoldingAssetIndicativePriceDate(String holdingAssetIndicativePriceDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(holdingAssetIndicativePriceDate)){
+			this.holdingAssetIndicativePriceDate = ParserUtility.convertToPimoneyDate(holdingAssetIndicativePriceDate.trim(), dateFormat);
+		}
+	}
 	/**
 	 * @return the holdingAssetProfit
 	 */
@@ -305,6 +343,11 @@ public class HoldingAsset {
 			this.holdingAssetProfit = holdingAssetProfit.trim();
 		}
 	}
+	public void setHoldingAssetProfit(String holdingAssetProfit, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetProfit)){
+			this.holdingAssetProfit = ParserUtility.formatAmount(holdingAssetProfit.trim());
+		}
+	}
 	/**
 	 * @return the holdingAssetProfitPerc
 	 */
@@ -317,6 +360,11 @@ public class HoldingAsset {
 	public void setHoldingAssetProfitPerc(String holdingAssetProfitPerc) {
 		if(StringUtils.isNotEmpty(holdingAssetProfitPerc)){
 			this.holdingAssetProfitPerc = holdingAssetProfitPerc.trim();
+		}
+	}
+	public void setHoldingAssetProfitPerc(String holdingAssetProfitPerc, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetProfitPerc)){
+			this.holdingAssetProfitPerc = ParserUtility.formatAmount(holdingAssetProfitPerc.trim());
 		}
 	}
 	/**
@@ -348,6 +396,12 @@ public class HoldingAsset {
 			this.holdingAssetMaturityDate = holdingAssetMaturityDate.trim();
 		}
 	}
+	
+	public void setHoldingAssetMaturityDate(String holdingAssetMaturityDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(holdingAssetMaturityDate)){
+			this.holdingAssetMaturityDate = ParserUtility.convertToPimoneyDate(holdingAssetMaturityDate.trim(), dateFormat);
+		}
+	}
 	/**
 	 * @return the holdingAssetIssuer
 	 */
@@ -376,6 +430,11 @@ public class HoldingAsset {
 			this.holdingAssetAccruedInterest = holdingAssetAccruedInterest.trim();
 		}
 	}
+	public void setHoldingAssetAccruedInterest(String holdingAssetAccruedInterest, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetAccruedInterest)){
+			this.holdingAssetAccruedInterest = ParserUtility.formatAmount(holdingAssetAccruedInterest.trim());
+		}
+	}
 	/**
 	 * @return the holdingAssetLastFxRate
 	 */
@@ -388,6 +447,11 @@ public class HoldingAsset {
 	public void setHoldingAssetLastFxRate(String holdingAssetLastFxRate) {
 		if(StringUtils.isNotEmpty(holdingAssetLastFxRate)){
 			this.holdingAssetLastFxRate = holdingAssetLastFxRate.trim();
+		}
+	}
+	public void setHoldingAssetLastFxRate(String holdingAssetLastFxRate, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetLastFxRate)){
+			this.holdingAssetLastFxRate = ParserUtility.formatAmount(holdingAssetLastFxRate.trim());
 		}
 	}
 	/**
@@ -404,6 +468,11 @@ public class HoldingAsset {
 			this.holdingAssetFxAccruredInterest = holdingAssetFxAccruredInterest.trim();
 		}
 	}
+	public void setHoldingAssetFxAccruredInterest(String holdingAssetFxAccruredInterest, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetFxAccruredInterest)){
+			this.holdingAssetFxAccruredInterest = ParserUtility.formatAmount(holdingAssetFxAccruredInterest.trim());
+		}
+	}
 	/**
 	 * @return the holdingAssetStartDate
 	 */
@@ -416,6 +485,12 @@ public class HoldingAsset {
 	public void setHoldingAssetStartDate(String holdingAssetStartDate) {
 		if(StringUtils.isNotEmpty(holdingAssetStartDate)){
 			this.holdingAssetStartDate = holdingAssetStartDate.trim();
+		}
+	}
+	
+	public void setHoldingAssetStartDate(String holdingAssetStartDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(holdingAssetStartDate)){
+			this.holdingAssetStartDate = ParserUtility.convertToPimoneyDate(holdingAssetStartDate.trim(), dateFormat);
 		}
 	}
 	/**
@@ -432,6 +507,11 @@ public class HoldingAsset {
 			this.holdingAssetFxMarketValue = holdingAssetFxMarketValue.trim();
 		}
 	}
+	public void setHoldingAssetFxMarketValue(String holdingAssetFxMarketValue, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetFxMarketValue)){
+			this.holdingAssetFxMarketValue = ParserUtility.formatAmount(holdingAssetFxMarketValue.trim());
+		}
+	}
 	/**
 	 * @return the holdingAssetUnrealizedProfitLoss
 	 */
@@ -444,6 +524,11 @@ public class HoldingAsset {
 	public void setHoldingAssetUnrealizedProfitLoss(String holdingAssetUnrealizedProfitLoss) {
 		if(StringUtils.isNotEmpty(holdingAssetUnrealizedProfitLoss)){
 			this.holdingAssetUnrealizedProfitLoss = holdingAssetUnrealizedProfitLoss.trim();
+		}
+	}
+	public void setHoldingAssetUnrealizedProfitLoss(String holdingAssetUnrealizedProfitLoss, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetUnrealizedProfitLoss)){
+			this.holdingAssetUnrealizedProfitLoss = ParserUtility.formatAmount(holdingAssetUnrealizedProfitLoss.trim());
 		}
 	}
 	/**
@@ -488,6 +573,12 @@ public class HoldingAsset {
 			this.holdingAssetCommencingDate = holdingAssetCommencingDate.trim();
 		}
 	}
+	
+	public void setHoldingAssetCommencingDate(String holdingAssetCommencingDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(holdingAssetCommencingDate)){
+			this.holdingAssetCommencingDate = ParserUtility.convertToPimoneyDate(holdingAssetCommencingDate.trim(), dateFormat);
+		}
+	}
 	/**
 	 * @return the holdingAssetCoupon
 	 */
@@ -502,6 +593,11 @@ public class HoldingAsset {
 			this.holdingAssetCoupon = holdingAssetCoupon.trim();
 		}
 	}
+	public void setHoldingAssetCoupon(String holdingAssetCoupon, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetCoupon)){
+			this.holdingAssetCoupon = ParserUtility.formatAmount(holdingAssetCoupon.trim());
+		}
+	}
 	
 	/**
 	 * @return the holdingAssetStrikePrice
@@ -514,7 +610,12 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetStrikePrice(String holdingAssetStrikePrice) {
 		if(StringUtils.isNotEmpty(holdingAssetStrikePrice)){
-			this.holdingAssetStrikePrice = holdingAssetStrikePrice;
+			this.holdingAssetStrikePrice = holdingAssetStrikePrice.trim();
+		}
+	}
+	public void setHoldingAssetStrikePrice(String holdingAssetStrikePrice, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetStrikePrice)){
+			this.holdingAssetStrikePrice = ParserUtility.formatAmount(holdingAssetStrikePrice.trim());
 		}
 	}
 	/**
@@ -528,7 +629,12 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetInterestTillMaturity(String holdingAssetInterestTillMaturity) {
 		if(StringUtils.isNotEmpty(holdingAssetInterestTillMaturity)){
-			this.holdingAssetInterestTillMaturity = holdingAssetInterestTillMaturity;
+			this.holdingAssetInterestTillMaturity = holdingAssetInterestTillMaturity.trim();
+		}
+	}
+	public void setHoldingAssetInterestTillMaturity(String holdingAssetInterestTillMaturity, boolean format) {
+		if(StringUtils.isNotEmpty(holdingAssetInterestTillMaturity)){
+			this.holdingAssetInterestTillMaturity = ParserUtility.formatAmount(holdingAssetInterestTillMaturity.trim());
 		}
 	}
 	/**
