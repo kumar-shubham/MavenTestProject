@@ -27,6 +27,7 @@ import com.pisight.pimoney.beans.ParserUtility;
 import com.pisight.pimoney.constants.Constants;
 import com.pisight.pimoney.models.HoldingAsset;
 import com.pisight.pimoney.models.InvestmentAccount;
+import com.pisight.pimoney.models.InvestmentTransaction;
 import com.pisight.pimoney.models.Response;
 
 public class MyClass {
@@ -45,7 +46,7 @@ public class MyClass {
 
 		PDFExtracter boxTest = null;
 		try{
-			boxTest = new PDFExtracter(getFile("investments/new3", "BSI HK", "pdf"),"");
+			boxTest = new PDFExtracter(getFile("investments/new", "EFG_Dec 2016", "pdf"),"");
 		}catch(Exception e){
 			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
 				System.out.println("Cannot decrypt PDF, the password is incorrect");
@@ -105,43 +106,24 @@ public class MyClass {
 
 	}
 	
-	private static String regex1 = "([A-Z]{3}) (-?\\d+\\.?\\d*) (\\d{8,9}\\.\\d{4})(?: (-?\\d+\\.?\\d*))?(?: (-?\\d+\\.?\\d{2}))?(?: (-?\\d+\\.?\\d{2})%)?";
+	// Assets
+	private static String regex1 = "([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (.*) (-?(?:\\d*,)*\\d+\\.?\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2})%";
 	private static Pattern  p1 = Pattern.compile(regex1);
 	
-	private static String regex2 = "([A-Z]{3}) (-?\\d+\\.?\\d*) (.*) (-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)%";
-	private static String regex3 = "(.* )?(-?\\d+\\.?\\d*)";
+	
+	// Cash Transactions
+	private static String regex2 = "(\\d{1,2}-\\d{2}) (.*) (\\d{1,2}-\\d{2}-\\d{2}) (-?(?:\\d*,)*\\d+\\.?\\d{2}) ((?:\\d*,)*\\d+\\.?\\d{2}(?:[A-Z]))";
+	private static String regex3 = "(\\d{6}\\.\\d{3}\\.\\d) ([A-Z]{3})";
 	private static Pattern p2 = Pattern.compile(regex2);
 	private static Pattern p3 = Pattern.compile(regex3);
 	
-	private static String regex4 = "([A-Z]{3}) (-?\\d+\\.?\\d*) (.*) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)% (-?\\d+\\.?\\d*)%";
-	private static String regex5 = "(.* )?\\((\\d{1,2}/\\d{2}/\\d{4})\\)";
-	private static String regex6 = "(.* )?(-?\\d+\\.?\\d{2}) (-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d{2})";
-	private static String regex7 = "(.* )?(-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d{2})";
-	private static String regex8 = "(.* )?(-?\\d+\\.?\\d{2}) (-?\\d+\\.?\\d{2})";
-	private static String regex9 = "(.* )?(-?\\d+\\.?\\d{2})";
-	private static Pattern p4 = Pattern.compile(regex4);
-	private static Pattern p5 = Pattern.compile(regex5);
-	private static Pattern p6 = Pattern.compile(regex6);
-	private static Pattern p7 = Pattern.compile(regex7);
-	private static Pattern p8 = Pattern.compile(regex8);
-	private static Pattern p9 = Pattern.compile(regex9);
-	
-	
-	private static String regex10 = "([A-Z]{3}) (-?\\d+\\.?\\d*) (.*) (-?\\d+\\.?\\d{2,4}) (-?\\d+\\.?\\d{2,4}) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)% (-?\\d+\\.?\\d*)%";
-	private static String regex11 = "(.* )?\\((\\d{1,2}/\\d{2}/\\d{4})\\)";
-	private static String regex12 = "(.* )?(-?\\d+\\.?\\d{4}) (-?\\d+\\.?\\d{4})";
-	private static Pattern p10 = Pattern.compile(regex10);
-	private static Pattern p11 = Pattern.compile(regex11);
-	private static Pattern p12 = Pattern.compile(regex12);
-	
-	
-	private static String regex13 = "([A-Z]{3}) (-?\\d+\\.?\\d*) (\\d{8,9}\\.\\d{4}) (.*) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)%";
-	private static String regex14 = "(.* )?(-?\\d+\\.?\\d{4})";
-	private static Pattern p13 = Pattern.compile(regex13);
-	private static Pattern p14 = Pattern.compile(regex14);
 
 	private static HoldingAsset currentAsset = null;
 	private static int rowCount = 0;
+	private static String lastBalance = null;
+	private static String category = null;
+	private static String transCurrency = null;
+	private static String transAccount = null;
 	public static void scrapeStatement(WebDriver driver) throws Exception{
 
 		HashMap<String, String> properties = new HashMap<String, String>();
@@ -150,48 +132,30 @@ public class MyClass {
 		System.out.println("#@#@#@#@##@#@##@#@#@##@#@#@#@#@##@#@#@#@#@#@##@#@#@#@#");
 		System.out.println("");
 		
-		WebElement accNumEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Portfolio')]]"));
+		WebElement accNumEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Valuation of All your Portfolios')]]/following-sibling::tr[1]"));
 		String accNum = accNumEle.getText().trim();
+		String currency = null;
+		String balance = null;
 		
-		String regex = "Portfolio (\\d{8,9}\\.\\d{4})( .*)?";
+		String regex = "(?:.* )?(\\d{6}-\\d) .* ([A-Z]{3}) (-?(?:\\d*,)*\\d+\\.?\\d{2})( .*)?";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(accNum);
 		
 		if(m.matches()){
 			accNum = m.group(1);
+			currency = m.group(2);
+			balance  = m.group(3);
 		}
 		
-		WebElement currencyEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Reference currency')]]"));
-		String currency = currencyEle.getText().trim();
 		
-		regex = "Reference currency ([A-Z]{3})( .*)?";
-		p = Pattern.compile(regex);
-		m = p.matcher(currency);
-		
-		if(m.matches()){
-			currency = m.group(1);
-		}
-		
-		WebElement stmtDateEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Portfolio statement as at')]]"));
+		WebElement stmtDateEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'VALUATION AS AT')]]"));
 		String stmtDate = stmtDateEle.getText().trim();
-		
-		regex = "Portfolio statement as at (\\d{1,2}\\.\\d{2}\\.\\d{4})( .*)?";
+		regex = "VALUATION AS AT (\\d{1,2} [A-z]{3,9} \\d{4})( .*)?";
 		p = Pattern.compile(regex);
 		m = p.matcher(stmtDate);
 		
 		if(m.matches()){
 			stmtDate = m.group(1);
-		}
-		
-		WebElement balanaceEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Total of Assets')]]"));
-		String balance = balanaceEle.getText().trim();
-		balance = balance.replace("'", "");
-		regex = "Total of Assets (-?\\d+\\.?\\d*)( .*)";
-		p = Pattern.compile(regex);
-		m = p.matcher(balance);
-		
-		if(m.matches()){
-			balance = m.group(1);
 		}
 		
 		System.out.println(accNum);
@@ -202,84 +166,36 @@ public class MyClass {
 		InvestmentAccount account = new InvestmentAccount(properties);
 		account.setAccountNumber(accNum);
 		account.setCurrency(currency);
-		account.setBillDate(ParserUtility.convertToPimoneyDate(stmtDate, Constants.DATEFORMAT_DD_DOT_MM_DOT_YYYY));
-		account.setBalance(ParserUtility.formatAmount(balance));
-		account.setAvailableBalance(ParserUtility.formatAmount(balance));
+		account.setBillDate(stmtDate, Constants.DATEFORMAT_DD_SPACE_MMMM_SPACE_YYYY);
+		account.setBalance(balance, true);
+		account.setAvailableBalance(balance, true);
 		account.setAccountName("Portfolio - " + currency);
 		response.addInvestmentAccount(account);
 		
-		List<WebElement> rows = driver.findElements(By.xpath("//tr[td[text() = 'Positions detail']]/following-sibling::tr"));
+		List<WebElement> rows = driver.findElements(By.xpath("//tr[td[contains(text() , 'CASH AND CASH EQUIVALENTS')]]/following-sibling::tr"));
 		
-		boolean isType1 = false;
+		boolean isType1 = true;
 		boolean isType2 = false;
-		boolean isType3 = false;
-		boolean isType4 = false;
-		boolean isType5 = false;
 		
 		
 		for(WebElement row: rows){
 			String rowText = row.getText().trim();
-			rowText = rowText.replace("'", "");
+			rowText = rowText.replace("−", "-");
 			System.out.println("RowText -> " + rowText);
 			
-			if(rowText.contains("BSI Ltd")){
+			if(rowText.contains("Cash Accounts")){
+				category = HoldingAsset.CATEGORY_CASH;
+			}
+			
+			if(rowText.toUpperCase().contains(" TOTAL") || rowText.contains("Not valid for tax purposes") || rowText.contains("Portfolio Valuation")){
 				System.out.println("Not a valid row. Skipping.");
 				currentAsset = null;
 				rowCount = 0;
 				continue;
 			}
-			else if(rowText.contains("Margin summary")){
-				System.out.println("End of statement");
-				break;
-			}
-			else if(rowText.contains("Cash accounts")){
-				isType1 = true;
-				isType2 = false;
-				isType3 = false;
-				isType4 = false;
-				isType5 = false;
-				currentAsset = null;
-				rowCount = 0;
-				continue;
-			}
-			else if(rowText.contains("Forward Forex and other Derivatives on Forex")){
+			else if(rowText.contains("STATEMENT OF ACCOUNT")){
 				isType1 = false;
 				isType2 = true;
-				isType3 = false;
-				isType4 = false;
-				isType5 = false;
-				currentAsset = null;
-				rowCount = 0;
-				continue;
-			}
-			if(rowText.contains("Bonds")){
-				isType1 = false;
-				isType2 = false;
-				isType3 = true;
-				isType4 = false;
-				isType5 = false;
-				currentAsset = null;
-				rowCount = 0;
-				continue;
-			}
-			if(rowText.contains("Equities")){
-				isType1 = false;
-				isType2 = false;
-				isType3 = false;
-				isType4 = true;
-				isType5 = false;
-				currentAsset = null;
-				rowCount = 0;
-				continue;
-			}
-			if(rowText.contains("Commodities")){
-				isType1 = false;
-				isType2 = false;
-				isType3 = false;
-				isType4 = false;
-				isType5 = true;
-				currentAsset = null;
-				rowCount = 0;
 				continue;
 			}
 			
@@ -289,23 +205,9 @@ public class MyClass {
 			else if(isType2){
 				getAssetType2(account, rowText);
 			}
-			else if(isType3){
-				getAssetType3(account, rowText);
-			}
-			else if(isType4){
-				getAssetType4(account, rowText);
-			}
-			else if(isType5){
-				getAssetType5(account, rowText);
-			}
 			
 		}
 		
-		List<HoldingAsset> assets = account.getAssets();
-		
-		for(HoldingAsset asset: assets){
-			getDetailsFromAssetDescription(asset);
-		}
 		
 		ObjectMapper mapper = new ObjectMapper();
 		Path path = Paths.get(System.getProperty("user.home"), "Documents", "bankStmt.json");
@@ -327,335 +229,112 @@ public class MyClass {
 		}
 	}
 
-	private static void getDetailsFromAssetDescription(HoldingAsset asset) throws ParseException {
-		// TODO Auto-generated method stub
-		String regex1 = "(?:.* )?(-?\\d+\\.?\\d*)%( .*)?";
-		String regex2 = "(?:.* )?(\\d{1,2}\\.\\d{2}\\.\\d{2,4})( .*)?";
-		String regex3 = "(?:.* )?([A-Z]{2}\\w{8}\\d{2})( .*)?";
-		
-		Pattern p1 = Pattern.compile(regex1);
-		Pattern p2 = Pattern.compile(regex2);
-		Pattern p3 = Pattern.compile(regex3);
-		
-		Matcher m1 = p1.matcher(asset.getHoldingAssetDescription());
-		Matcher m2 = p2.matcher(asset.getHoldingAssetDescription());
-		Matcher m3 = p3.matcher(asset.getHoldingAssetDescription());
+
+	private static void getAssetType1(InvestmentAccount account, String rowText) throws ParseException {
+		// Pattern p1
+		Matcher m1= p1.matcher(rowText);
 		
 		if(m1.matches()){
-			String coupon = m1.group(1);
-			asset.setHoldingAssetCoupon(coupon, true);
-		}
-		if(m2.matches()){
-			String maturity = m2.group(1);
-			if(maturity.length() < 10){
-				asset.setHoldingAssetMaturityDate(maturity, Constants.DATEFORMAT_DD_DOT_MM_DOT_YY);
-			}
-			else{
-				asset.setHoldingAssetMaturityDate(maturity, Constants.DATEFORMAT_DD_DOT_MM_DOT_YYYY);
-			}
-		}
-		if(m3.matches()){
-			String isin = m3.group(1);
-			asset.setHoldingAssetISIN(isin);
-		}
-	}
-
-	private static void getAssetType1(InvestmentAccount account, String rowText) {
-		// Pattern p1
-		Matcher m = p1.matcher(rowText);
-		
-		if(m.matches()){
 			rowCount =1;
-			String currency = m.group(1);
-			String quantity = m.group(2);
-			String number = m.group(3);
-			String value = m.group(4);
-			String fxValue = m.group(5);
+			
+			String currency = m1.group(1);
+			String quantity = m1.group(2);
+			String description = m1.group(3);
+			String fxValue = m1.group(4);
 			
 			HoldingAsset asset = new HoldingAsset();
 			
 			asset.setHoldingAssetAccountNumber(account.getAccountNumber());
-			asset.setHoldingAssetCurrency(currency);
+			asset.setHoldingAssetDescription(description);
 			asset.setHoldingAssetQuantity(quantity, true);
-			asset.setHoldingAssetSubAccountNumber(number);
-			asset.setHoldingAssetDescription(number);
-			asset.setHoldingAssetCurrentValue(value, true);
+			asset.setHoldingAssetCurrency(currency);
 			asset.setHoldingAssetFxMarketValue(fxValue, true);
-			asset.setHoldingAssetSubCategory(HoldingAsset.CATEGORY_CASH);
+			asset.setHoldingAssetCategory(category);
 			account.addAsset(asset);
 			currentAsset = asset;
+			
 		}
-		else if(rowCount == 1 && currentAsset != null && rowText.matches("(-?\\d+\\.?\\d*)")){
-			String fxRate = rowText;
-			currentAsset.setHoldingAssetLastFxRate(fxRate, true);
-			currentAsset = null;
+		else if(rowCount == 1 && currentAsset != null && rowText.matches("\\d{6}\\.\\d{3}\\.\\d")){
+			String description = rowText;
+			
+			currentAsset.setHoldingAssetSubAccountNumber(description);
+			if(StringUtils.isNotEmpty(description)){
+				description = currentAsset.getHoldingAssetDescription() + " " + description;
+				currentAsset.setHoldingAssetDescription(description.trim());
+			}
 			rowCount = 0;
+			currentAsset = null;
 		}
 		
 	}
 
-	private static void getAssetType2(InvestmentAccount account, String rowText) {
+	private static void getAssetType2(InvestmentAccount account, String rowText) throws Exception {
 		// Pattern p2, p3
+		
 		Matcher m1 = p2.matcher(rowText);
 		Matcher m2 = p3.matcher(rowText);
 		
-		if(m1.matches()){
-			rowCount = 1;
-			String currency = m1.group(1);
-			String quantity = m1.group(2);
-			String description = m1.group(3);
-			String unitCost = m1.group(4);
-			String unitPrice = m1.group(5);
-			String fxValue = m1.group(6);
+		
+		if(m1.matches() && StringUtils.isNotEmpty(lastBalance) && StringUtils.isNotEmpty(transCurrency)){
 			
-			HoldingAsset asset = new HoldingAsset();
+			String date = m1.group(1);
+			String description = m1.group(2);
+			String valueDate = m1.group(3);
+			String amount = m1.group(4);
+			String runningBalance = m1.group(5);
+			String type  = null;
 			
-			asset.setHoldingAssetAccountNumber(account.getAccountNumber());
-			asset.setHoldingAssetCurrency(currency);
-			asset.setHoldingAssetQuantity(quantity, true);
-			asset.setHoldingAssetDescription(description);
-			asset.setHoldingAssetAverageUnitCost(unitCost, true);
-			asset.setHoldingAssetIndicativePrice(unitPrice, true);
-			asset.setHoldingAssetFxMarketValue(fxValue, true);
-			asset.setHoldingAssetCategory(HoldingAsset.CATEGORY_ALTERNATE_TRADING_STRATEGY);
-			account.addAsset(asset);
-			currentAsset = asset;
-		}
-		else if(m2.matches() && rowCount == 2 && currentAsset != null){
-			String description = m2.group(1);
-			String fxRate = m2.group(2);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
+			runningBalance = ParserUtility.formatAmount(runningBalance);
+			if(runningBalance.contains("C")){
+				runningBalance = runningBalance.replace("C", "").trim();
+				
+			}
+			else if(runningBalance.contains("D")){
+				runningBalance = "-"+ runningBalance.replace("D", "").trim();
 			}
 			
-			currentAsset.setHoldingAssetLastFxRate(fxRate, true);
-			currentAsset = null;
-			rowCount = 0;
-		}
-		else if(rowCount == 1 && currentAsset != null){
-			rowCount = 2;
-			String description = currentAsset.getHoldingAssetDescription() + " " + rowText;
-			currentAsset.setHoldingAssetDescription(description.trim());
+			lastBalance = ParserUtility.formatAmount(lastBalance);
+			if(lastBalance.contains("C")){
+				lastBalance = lastBalance.replace("C", "").trim();
+				
+			}
+			else if(lastBalance.contains("D")){
+				lastBalance = "-"+ lastBalance.replace("D", "").trim();
+			}
+			
+			double runningBalanceD = Double.parseDouble(runningBalance);
+			double lastBalanceD = Double.parseDouble(lastBalance);
+			
+			if(runningBalanceD > lastBalanceD){
+				type = InvestmentTransaction.TRANSACTION_TYPE_INFLOW;
+			}
+			else{
+				type = InvestmentTransaction.TRANSACTION_TYPE_OUTFLOW;
+			}
+			lastBalance = runningBalance;
+			
+			InvestmentTransaction transaction = new InvestmentTransaction();
+			
+			transaction.setAccountNumber(account.getAccountNumber());
+			
+			transaction.setTransactionDate(ParserUtility.getYear(date, Constants.DATEFORMAT_DD_DASH_MM, valueDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YY));
+			transaction.setDescription(description);
+			transaction.setValuationDate(valueDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YY);
+			transaction.setAmount(amount, true);
+			transaction.setType(type);
+			transaction.setCurrency(transCurrency);
+			transaction.setSubAccountNumber(transAccount);
+			transaction.setAssetCategory(HoldingAsset.CATEGORY_CASH);
+			account.addTransaction(transaction);
 			
 		}
-		
+		else if(m2.matches()){
+			transAccount = m2.group(1);
+			transCurrency = m2.group(2);
+		}
+		else if(rowText.contains("Initial balance")){
+			lastBalance = rowText.substring(rowText.lastIndexOf(" ")).trim();
+		}
 	}
-
-	private static void getAssetType3(InvestmentAccount account, String rowText) throws ParseException {
-		// Pattern p4, p5, p6, p7, p8, p9
-		
-		Matcher m1 = p4.matcher(rowText);
-		Matcher m2 = p5.matcher(rowText);
-		Matcher m3 = p6.matcher(rowText);
-		Matcher m4 = p7.matcher(rowText);
-		Matcher m5 = p8.matcher(rowText);
-		Matcher m6 = p9.matcher(rowText);
-		
-		if(m1.matches()){
-			rowCount = 1;
-			String currency = m1.group(1);
-			String quantity = m1.group(2);
-			String description = m1.group(3);
-			String unitCost = m1.group(5);
-			String unitPrice = m1.group(6);
-			String value = m1.group(7);
-			String fxValue = m1.group(8);
-			
-			HoldingAsset asset = new HoldingAsset();
-			
-			asset.setHoldingAssetAccountNumber(account.getAccountNumber());
-			asset.setHoldingAssetCurrency(currency);
-			asset.setHoldingAssetQuantity(quantity, true);
-			asset.setHoldingAssetDescription(description);
-			asset.setHoldingAssetAverageUnitCost(unitCost, true);
-			asset.setHoldingAssetIndicativePrice(unitPrice, true);
-			asset.setHoldingAssetCurrentValue(value, true);
-			asset.setHoldingAssetFxMarketValue(fxValue, true);
-			asset.setHoldingAssetSubCategory(HoldingAsset.CATEGORY_BOND);
-			asset.setBondNature(true);
-			account.addAsset(asset);
-			currentAsset = asset;
-		}
-		else if(m2.matches() && rowCount == 1 && currentAsset != null){
-			rowCount = 2;
-			String description = m2.group(1);
-			String valueDate = m2.group(2);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			currentAsset.setHoldingAssetIndicativePriceDate(valueDate, Constants.DATEFORMAT_DD_SLASH_MM_SLASH_YYYY);
-		}
-		else if(m3.matches() && rowCount == 2 && currentAsset != null){
-			rowCount = 3;
-			String description = m3.group(1);
-			String ytm = m3.group(2);
-			String lastFxRate = m3.group(4);
-			String accruedInterest = m3.group(5);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			
-			currentAsset.setHoldingAssetYield(ytm, true);
-			currentAsset.setHoldingAssetLastFxRate(lastFxRate, true);
-			currentAsset.setHoldingAssetAccruedInterest(accruedInterest, true);
-		}
-		else if(m4.matches() && rowCount == 2 && currentAsset != null){
-			rowCount = 3;
-			String description = m4.group(1);
-			String lastFxRate = m4.group(3);
-			String accruedInterest = m4.group(4);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			currentAsset.setHoldingAssetLastFxRate(lastFxRate, true);
-			currentAsset.setHoldingAssetAccruedInterest(accruedInterest, true);
-			
-		}
-		else if(m5.matches() && rowCount == 2 && currentAsset != null){
-			rowCount = 3;
-			String description = m5.group(1);
-			String ytm = m5.group(2);
-			String accruedInterest = m5.group(3);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			currentAsset.setHoldingAssetYield(ytm, true);
-			currentAsset.setHoldingAssetAccruedInterest(accruedInterest, true);
-			
-		}
-		else if(m6.matches() && rowCount == 2 && currentAsset != null){
-			rowCount = 3;
-			String description = m6.group(1);
-			String accruedInterest = m6.group(2);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			currentAsset.setHoldingAssetAccruedInterest(accruedInterest, true);
-			
-		}
-		else if(rowCount == 3 && currentAsset != null){
-			String description = currentAsset.getHoldingAssetDescription() + " " + rowText;
-			currentAsset.setHoldingAssetDescription(description.trim());
-		}
-		
-	}
-
-	private static void getAssetType4(InvestmentAccount account, String rowText) throws ParseException {
-		// Pattern p10, p11, p12
-		
-		Matcher m1 = p10.matcher(rowText);
-		Matcher m2 = p11.matcher(rowText);
-		Matcher m3 = p12.matcher(rowText);
-		
-		if(m1.matches()){
-			rowCount = 1;
-			String currency = m1.group(1);
-			String quantity = m1.group(2);
-			String description = m1.group(3);
-			String unitCost = m1.group(4);
-			String unitPrice = m1.group(5);
-			String value = m1.group(6);
-			String fxValue = m1.group(7);
-			
-			HoldingAsset asset = new HoldingAsset();
-			
-			asset.setHoldingAssetAccountNumber(account.getAccountNumber());
-			asset.setHoldingAssetCurrency(currency);
-			asset.setHoldingAssetQuantity(quantity, true);
-			asset.setHoldingAssetDescription(description);
-			asset.setHoldingAssetAverageUnitCost(unitCost, true);
-			asset.setHoldingAssetIndicativePrice(unitPrice, true);
-			asset.setHoldingAssetCurrentValue(value, true);
-			asset.setHoldingAssetFxMarketValue(fxValue, true);
-			asset.setHoldingAssetSubCategory(HoldingAsset.CATEGORY_UNIT_TRUST__MUTUAL_FUND);
-			account.addAsset(asset);
-			currentAsset = asset;
-		}
-		else if(m2.matches() && rowCount == 1 && currentAsset != null){
-			rowCount = 2;
-			String description = m2.group(1);
-			String valueDate = m2.group(2);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			currentAsset.setHoldingAssetIndicativePriceDate(valueDate, Constants.DATEFORMAT_DD_SLASH_MM_SLASH_YYYY);
-		}
-		else if(m3.matches() && rowCount == 2 && currentAsset != null){
-			rowCount = 3;
-			String description = m3.group(1);
-			String lastFxRate = m3.group(3);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			currentAsset.setHoldingAssetLastFxRate(lastFxRate, true);
-		}
-		
-		else if(rowCount == 3 && currentAsset != null){
-			String description = currentAsset.getHoldingAssetDescription() + " " + rowText;
-			currentAsset.setHoldingAssetDescription(description.trim());
-		}
-		
-		
-	}
-
-	private static void getAssetType5(InvestmentAccount account, String rowText) {
-		// Pattern p13, p14
-		
-		Matcher m1 = p13.matcher(rowText);
-		Matcher m2 = p14.matcher(rowText);
-		
-		if(m1.matches()){
-			rowCount = 1;
-			String currency = m1.group(1);
-			String quantity = m1.group(2);
-			String number = m1.group(3);
-			String description = m1.group(4);
-			String accruedInterest = m1.group(5);
-			String fxValue = m1.group(6);
-			
-			HoldingAsset asset = new HoldingAsset();
-			
-			asset.setHoldingAssetAccountNumber(account.getAccountNumber());
-			asset.setHoldingAssetCurrency(currency);
-			asset.setHoldingAssetQuantity(quantity, true);
-			asset.setHoldingAssetSubAccountNumber(number);
-			asset.setHoldingAssetDescription(description);
-			asset.setHoldingAssetAccruedInterest(accruedInterest, true);
-			asset.setHoldingAssetFxMarketValue(fxValue, true);
-			asset.setHoldingAssetSubCategory(HoldingAsset.CATEGORY_COMMODITY);
-			account.addAsset(asset);
-			currentAsset = asset;
-		}
-		else if(m2.matches() && rowCount == 1 && currentAsset != null){
-			String description = m2.group(1);
-			String fxRate = m2.group(2);
-			
-			if(StringUtils.isNotEmpty(description)){
-				description = currentAsset.getHoldingAssetDescription() + " " + description;
-				currentAsset.setHoldingAssetDescription(description.trim());
-			}
-			currentAsset.setHoldingAssetLastFxRate(fxRate, true);
-			currentAsset = null;
-			rowCount = 0;
-		}
-		
-	}
-
 
 }

@@ -1,5 +1,6 @@
 package com.pisight.pimoney.models;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,6 +102,9 @@ public class InvestmentAccount extends Container {
 	public void setBalance(String balance) {
 		this.balance = balance;
 	}
+	public void setBalance(String balance, boolean format) {
+		this.balance = ParserUtility.formatAmount(balance);
+	}
 
 	/**
 	 * @return the availableBalance
@@ -114,6 +118,9 @@ public class InvestmentAccount extends Container {
 	 */
 	public void setAvailableBalance(String availableBalance) {
 		this.availableBalance = availableBalance;
+	}
+	public void setAvailableBalance(String availableBalance, boolean format) {
+		this.availableBalance = ParserUtility.formatAmount(availableBalance);
 	}
 
 	/**
@@ -185,6 +192,9 @@ public class InvestmentAccount extends Container {
 	 */
 	public void setBillDate(String billDate) {
 		this.billDate = billDate;
+	}
+	public void setBillDate(String billDate, String dateFormat) throws ParseException {
+		this.billDate = ParserUtility.convertToPimoneyDate(billDate, dateFormat);
 	}
 	
 	

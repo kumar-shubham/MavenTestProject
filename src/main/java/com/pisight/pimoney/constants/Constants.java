@@ -15,6 +15,7 @@ public class Constants {
 	public static final String DATEFORMAT_DD_SPACE_MMM_SPACE_YYYY = "dd MMM yyyy";
 	public static final String DATEFORMAT_MMM_SPACE_DD_COMMA_YYYY = "MMM dd,yyyy";
 	public static final String DATEFORMAT_DD_DASH_MM_DASH_YYYY = "dd-MM-yyyy";
+	public static final String DATEFORMAT_DD_DASH_MM_DASH_YY = "dd-MM-yy";
 	public static final String DATEFORMAT_DD_DASH_MMM_DASH_YYYY = "dd-MMM-yyyy";
 	public static final String DATEFORMAT_MMMM_SPACE_DD_COMMA_YYYY = "MMMM dd,yyyy";
 	public static final String DATEFORMAT_MMMM_SPACE_DD_COMMA_SPACE_YYYY = "MMMM dd, yyyy";
@@ -34,6 +35,7 @@ public class Constants {
 	public static final String DATEFORMAT_DD_SPACE_MMM = "dd MMM";
 	public static final String DATEFORMAT_MMMM_SPACE_DD = "MMMM dd";
 	public static final String DATEFORMAT_DD_SLASH_MM  = "dd/MM";
+	public static final String DATEFORMAT_DD_DASH_MM  = "dd-MM";
 	
 	public static final String MFA_TYPE_OTP = "OTP";
 	public static final String MFA_TYPE_IMAGE = "IMAGE";
@@ -97,6 +99,7 @@ public class Constants {
 		dateFormatList.add(DATEFORMAT_DD_SPACE_MMM_SPACE_YY);
 		dateFormatList.add(DATEFORMAT_DD_SLASH_MM_SLASH_YY);
 		dateFormatList.add(DATEFORMAT_DD_MMM_YYYY);
+		dateFormatList.add(DATEFORMAT_DD_DASH_MM_DASH_YY);
 	}
 
 }

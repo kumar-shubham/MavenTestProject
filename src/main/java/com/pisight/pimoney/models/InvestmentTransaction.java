@@ -1,5 +1,7 @@
 package com.pisight.pimoney.models;
 
+import java.text.ParseException;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.pisight.pimoney.beans.ParserUtility;
@@ -157,6 +159,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.assetYield = assetYield;
 		}
 	}
+	public void setAssetYield(String assetYield, boolean format) {
+		if(StringUtils.isNotEmpty(assetYield)){
+			this.assetYield = ParserUtility.formatAmount(assetYield);
+		}
+	}
 	/**
 	 * @return the assetQuantity
 	 */
@@ -169,6 +176,11 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setAssetQuantity(String assetQuantity) {
 		if(StringUtils.isNotEmpty(assetQuantity)){
 			this.assetQuantity = assetQuantity;
+		}
+	}
+	public void setAssetQuantity(String assetQuantity, boolean format) {
+		if(StringUtils.isNotEmpty(assetQuantity)){
+			this.assetQuantity = ParserUtility.formatAmount(assetQuantity);
 		}
 	}
 	/**
@@ -185,6 +197,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.assetUnitCost = assetUnitCost;
 		}
 	}
+	public void setAssetUnitCost(String assetUnitCost, boolean format) {
+		if(StringUtils.isNotEmpty(assetUnitCost)){
+			this.assetUnitCost = ParserUtility.formatAmount(assetUnitCost);
+		}
+	}
 	/**
 	 * @return the assetCost
 	 */
@@ -199,6 +216,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.assetCost = assetCost;
 		}
 	}
+	public void setAssetCost(String assetCost, boolean format) {
+		if(StringUtils.isNotEmpty(assetCost)){
+			this.assetCost = ParserUtility.formatAmount(assetCost);
+		}
+	}
 	/**
 	 * @return the assetTradeDate
 	 */
@@ -211,6 +233,11 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setAssetTradeDate(String assetTradeDate) {
 		if(StringUtils.isNotEmpty(assetTradeDate)){
 			this.assetTradeDate = assetTradeDate;
+		}
+	}
+	public void setAssetTradeDate(String assetTradeDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(assetTradeDate)){
+			this.assetTradeDate = ParserUtility.convertToPimoneyDate(assetTradeDate, dateFormat);
 		}
 	}
 	/**
@@ -241,6 +268,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.assetBondRate = assetBondRate;
 		}
 	}
+	public void setAssetBondRate(String assetBondRate, boolean format) {
+		if(StringUtils.isNotEmpty(assetBondRate)){
+			this.assetBondRate = ParserUtility.formatAmount(assetBondRate);
+		}
+	}
 	/**
 	 * @return the assetBondMaturityDate
 	 */
@@ -253,6 +285,11 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setAssetBondMaturityDate(String assetBondMaturityDate) {
 		if(StringUtils.isNotEmpty(assetBondMaturityDate)){
 			this.assetBondMaturityDate = assetBondMaturityDate;
+		}
+	}
+	public void setAssetBondMaturityDate(String assetBondMaturityDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(assetBondMaturityDate)){
+			this.assetBondMaturityDate = ParserUtility.convertToPimoneyDate(assetBondMaturityDate, dateFormat);
 		}
 	}
 	/**
@@ -297,6 +334,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.valuationDate = valuationDate;
 		}
 	}
+	public void setValuationDate(String valuationDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(valuationDate)){
+			this.valuationDate = ParserUtility.convertToPimoneyDate(valuationDate, dateFormat);
+		}
+	}
 	
 	/**
 	 * @return the type
@@ -326,6 +368,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.amount = amount;
 		}
 	}
+	public void setAmount(String amount, boolean format) {
+		if(StringUtils.isNotEmpty(amount)){
+			this.amount = ParserUtility.formatAmount(amount);
+		}
+	}
 	/**
 	 * @return the transactionDate
 	 */
@@ -338,6 +385,11 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setTransactionDate(String transactionDate) {
 		if(StringUtils.isNotEmpty(transactionDate)){
 			this.transactionDate = transactionDate;
+		}
+	}
+	public void setTransactionDate(String transactionDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(transactionDate)){
+			this.transactionDate = ParserUtility.convertToPimoneyDate(transactionDate, dateFormat);
 		}
 	}
 	/**
@@ -369,6 +421,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.startDate = startDate;
 		}
 	}
+	public void setStartDate(String startDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(startDate)){
+			this.startDate = ParserUtility.convertToPimoneyDate(startDate, dateFormat);
+		}
+	}
 	/**
 	 * @return the maturityDate
 	 */
@@ -381,6 +438,11 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setMaturityDate(String maturityDate) {
 		if(StringUtils.isNotEmpty(maturityDate)){
 			this.maturityDate = maturityDate;
+		}
+	}
+	public void setMaturityDate(String maturityDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(maturityDate)){
+			this.maturityDate = ParserUtility.convertToPimoneyDate(maturityDate, dateFormat);
 		}
 	}
 	/**
@@ -397,6 +459,11 @@ public class InvestmentTransaction extends TransactionBase{
 			this.coupon = coupon;
 		}
 	}
+	public void setCoupon(String coupon, boolean format) {
+		if(StringUtils.isNotEmpty(coupon)){
+			this.coupon = ParserUtility.formatAmount(coupon);
+		}
+	}
 	/**
 	 * @return the accruedInterest
 	 */
@@ -409,6 +476,11 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setAccruedInterest(String accruedInterest) {
 		if(StringUtils.isNotEmpty(accruedInterest)){
 			this.accruedInterest = accruedInterest;
+		}
+	}
+	public void setAccruedInterest(String accruedInterest, boolean format) {
+		if(StringUtils.isNotEmpty(accruedInterest)){
+			this.accruedInterest = ParserUtility.formatAmount(accruedInterest);
 		}
 	}
 	/**
