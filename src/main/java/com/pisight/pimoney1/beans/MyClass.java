@@ -1,7 +1,5 @@
 package com.pisight.pimoney1.beans;
 
-import static org.hamcrest.CoreMatchers.containsString;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,6 +23,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pisight.pimoney.beans.ParserUtility;
 import com.pisight.pimoney.constants.Constants;
 import com.pisight.pimoney.models.HoldingAsset;
 import com.pisight.pimoney.models.InvestmentAccount;
@@ -98,46 +97,45 @@ public class MyClass {
 		return driver;
 	}
 
-	String regexQuantity1 = "(?:.* )?Number of Shares: ((?:\\d*,)*\\d+\\.?\\*)(?: .*)?";
-	String regexQuantity2 = "(?:.* )?You [A-z]+ ((?:\\d*,)*\\d+\\.?\\*) Shares(?: .*)?";
-	String regexQuantity3 = "(?:.* )?Principal Amount:  .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	String regexQuantity4 = "[A-Z]{3} ((?:\\d*,)*\\d+\\.?\\*) .*";
-	String regexQuantity5 = "((?:\\d*,)*\\d+\\.?\\*) .*";
-	Pattern pQuantity1 = Pattern.compile(regexQuantity1);
-	Pattern pQuantity2 = Pattern.compile(regexQuantity2);
-	Pattern pQuantity3 = Pattern.compile(regexQuantity3);
-	Pattern pQuantity4 = Pattern.compile(regexQuantity4);
-	Pattern pQuantity5 = Pattern.compile(regexQuantity5);
-	
-	String regexUnitCost1 = "(?:.* )?At the price of: ((?:\\d*,)*\\d+\\.?\\*) [A-Z]{3}(?: .*)?";
-	String regexUnitCost2 = "(?:.* )?Premium per Share: ((?:\\d*,)*\\d+\\.?\\*) [A-Z]{3}(?: .*)?";
-	Pattern pUntiCost1 = Pattern.compile(regexUnitCost1);
-	Pattern pUntiCost2 = Pattern.compile(regexUnitCost2);
-	
-	String regexInterest = "(?:.* )?((?:\\d*,)*\\d+\\.?\\*) ?%(?: .*)?";
-	Pattern pInterest = Pattern.compile(regexInterest);
-	
-	String regexInterestAndDates = "(\\d{1,2}-\\d{2}-\\d{4}) - (\\d{1,2}-\\d{2}-\\d{4}) ((?:\\d*,)*\\d+\\.?\\d*) % .* ((?:\\+|-)?(?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}";
-	Pattern pInterestAndDates = Pattern.compile(regexInterestAndDates);
-	
-	String regexTransLevies1 = "(?:.* )?Transaction Levy: .((?:\\d*,)*\\d+\\.?\\*) [A-Z]{3}(?: .*)?";
-	String regexTransLevies2 = "(?:.* )?Brokerage / Commission: .((?:\\d*,)*\\d+\\.?\\*) [A-Z]{3}(?: .*)?";
-	String regexTransLevies3 = "(?:.* )?GST.*: .((?:\\d*,)*\\d+\\.?\\*) [A-Z]{3}(?: .*)?";
-	Pattern pTransLevies1 = Pattern.compile(regexTransLevies1);
-	Pattern pTransLevies2 = Pattern.compile(regexTransLevies2);
-	Pattern pTransLevies3 = Pattern.compile(regexTransLevies3);
-	
-	String regexStrikePrice = "(?:.* )?Strike Price: ((?:\\d*,)*\\d+\\.?\\*) [A-Z]{3}(?: .*)?";
-	Pattern pStrikePrice = Pattern.compile(regexStrikePrice);
-	
-	String regexExpiryDate = "(?:.* )?Expiry Date/Time: (\\d{1,2}-[A-Z]{3}-\\d{4}))(?: .*)?";
-	Pattern pExpiryDate= Pattern.compile(regexExpiryDate);
-	
+	private static String regexQuantity1 = "(?:.* )?Number of Shares: ((?:\\d*,)*\\d+\\.?\\d*)(?: .*)?";
+	private static String regexQuantity2 = "(?:.* )?You [A-z]+ ((?:\\d*,)*\\d+\\.?\\d*) Shares(?: .*)?";
+	private static String regexQuantity3 = "(?:.* )?Principal Amount: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+	private static String regexQuantity4 = "[A-Z]{3} ((?:\\d*,)*\\d+\\.?\\d*) .*";
+	private static String regexQuantity5 = "((?:\\d*,)*\\d+\\.?\\d*) .*";
+	private static Pattern pQuantity1 = Pattern.compile(regexQuantity1);
+	private static Pattern pQuantity2 = Pattern.compile(regexQuantity2);
+	private static Pattern pQuantity3 = Pattern.compile(regexQuantity3);
+	private static Pattern pQuantity4 = Pattern.compile(regexQuantity4);
+	private static Pattern pQuantity5 = Pattern.compile(regexQuantity5);
+
+	private static String regexUnitCost1 = "(?:.* )?At the price of: ((?:\\d*,)*\\d+\\.?\\d*) ((?:[A-Z]{3})|(?:%))(?: .*)?";
+	private static String regexUnitCost2 = "(?:.* )?Premium per Share: ((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+	private static Pattern pUntiCost1 = Pattern.compile(regexUnitCost1);
+	private static Pattern pUnitCost2 = Pattern.compile(regexUnitCost2);
+
+	private static String regexInterest = "(?:.* )?((?:\\d*,)*\\d+\\.?\\d*) ?%(?: .*)?";
+	private static Pattern pInterest = Pattern.compile(regexInterest);
+
+	private static String regexInterestAndDates = "(\\d{1,2}-\\d{2}-\\d{4}) - (\\d{1,2}-\\d{2}-\\d{4}) ((?:\\d*,)*\\d+\\.?\\d*) % .* ((?:\\+|-)?(?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}";
+	private static Pattern pInterestAndDates = Pattern.compile(regexInterestAndDates);
+
+	private static String regexTransLevies1 = "(?:.* )?Transaction Levy: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+	private static String regexTransLevies2 = "(?:.* )?Brokerage / Commission: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+	private static String regexTransLevies3 = "(?:.* )?GST .*\\): .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+	private static String regexTransLevies4 = "(?:.* )?Trading Fee: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+	private static Pattern pTransLevies1 = Pattern.compile(regexTransLevies1);
+	private static Pattern pTransLevies2 = Pattern.compile(regexTransLevies2);
+	private static Pattern pTransLevies3 = Pattern.compile(regexTransLevies3);
+	private static Pattern pTransLevies4 = Pattern.compile(regexTransLevies4);
+
+	private static String regexStrikePrice = "(?:.* )?Strike Price: ((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
+	private static Pattern pStrikePrice = Pattern.compile(regexStrikePrice);
+
+	private static String regexExpiryDate = "(?:.* )?Expiry Date/Time: (\\d{1,2}-[A-Z]{3}-\\d{4})(?: .*)?";
+	private static Pattern pExpiryDate= Pattern.compile(regexExpiryDate);
+
 
 	private static InvestmentTransaction currentTrans = null;
-	private static int transactionLevies = 0; // to consolidate transaction levies(Transaction Levy, Brokerage / Commission, GST)
-	private static boolean isInterestPresent = false; // to get interest rate if present in the next line
-	private static boolean isDurationPresent = false; // to get duration if present in the next line
 	private static int rowCount = 0; // rowCount 1 for get second line description if present
 	public static void scrapeStatement(WebDriver driver) throws Exception{
 
@@ -219,6 +217,7 @@ public class MyClass {
 			Matcher mCur3 = pCur3.matcher(rowText);
 
 			if(m.matches()){
+				System.out.println("## 1 ##");
 				rowCount = 1;
 				String transDate = m.group(1);
 				String description = m.group(2);
@@ -248,24 +247,37 @@ public class MyClass {
 				account.addTransaction(transaction);
 				currentTrans = transaction;
 			}
+			else if(rowText.matches("\\d{1,2}-\\d{2}-\\d{2}")){
+				System.out.println("## 2 ##");
+				rowCount = 1;
+				currentTrans.setValuationDate(rowText, Constants.DATEFORMAT_DD_DASH_MM_DASH_YY);
+			}
 			else if(mCur1.matches()){
+				System.out.println("## 3 ##");
 				transCurrency = mCur1.group(1);
 				rowCount = 0;
 			}
 			else if(mCur2.matches()){
+				System.out.println("## 4 ##");
 				transCurrency = mCur2.group(1);
 				rowCount = 0;
 			}
 			else if(mCur3.matches()){
+				System.out.println("## 5 ##");
 				transCurrency = mCur3.group(1);
 				rowCount = 0;
 			}
 			else if(currentTrans != null){
-				rowCount = 0;
-				if(rowCount  == 1 && rowText.contains(":")){
+				System.out.println("## 6 ##");
+				if(rowCount  == 1 && !rowText.contains(":")){
+					System.out.println("2^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^666");
 					String descRegex = "(.*) \\| ([A-Z]{2}\\w{8}\\d{2})";
 					Pattern pDesc = Pattern.compile(descRegex);
 					Matcher mDesc = pDesc.matcher(rowText);
+					Matcher mQuantity4 = pQuantity4.matcher(rowText);
+					Matcher mQuantity5 = pQuantity5.matcher(rowText);
+					Matcher mInterest = pInterest.matcher(rowText);
+					System.out.println(mDesc.matches() + " : " + mQuantity4.matches() + " : " + mQuantity5.matches() + " : " + mInterest.matches());
 					if(mDesc.matches()){
 						String description = mDesc.group(1);
 						String isin = mDesc.group(2);
@@ -277,15 +289,29 @@ public class MyClass {
 						String description = rowText + " " + currentTrans.getDescription();
 						currentTrans.setDescription(description.trim());
 					}
+
+					if(mQuantity4.matches()){
+						String quantity = mQuantity4.group(1);
+						currentTrans.setAssetQuantity(quantity, true);
+					}
+					else if(mQuantity5.matches()){
+						String quantity = mQuantity5.group(1);
+						currentTrans.setAssetQuantity(quantity, true);
+					}
+
+					if(mInterest.matches()){
+						String coupon = mInterest.group(1);
+						currentTrans.setCoupon(coupon, true);
+					}
 					continue;
 				}
+				rowCount = 0;
 				getQuantity(rowText);
 				getUnitCost(rowText);
 				getInterest(rowText);
 				getTransactionLevies(rowText);
 				getStrikePrice(rowText);
 				getExpiryDate(rowText);
-				getStartAndMaturityDate(rowText);
 			}
 
 		}
@@ -311,39 +337,160 @@ public class MyClass {
 	}
 
 	private static void getQuantity(String rowText) {
-		// TODO Auto-generated method stub
+		// Pattern pQuantity1, pQuantity2, pQuantity3
+
+		if(currentTrans == null){
+			return;
+		}
+		Matcher m1 = pQuantity1.matcher(rowText);
+		Matcher m2 = pQuantity2.matcher(rowText);
+		Matcher m3 = pQuantity3.matcher(rowText);
+		
+
+		String quantity = null;
+		if(m1.matches()){
+			quantity = m1.group(1);
+		}
+		else if(m2.matches()){
+			quantity = m2.group(1);
+		}
+		else  if(m3.matches()){
+			quantity = m3.group(1);
+		}
+
+		currentTrans.setAssetQuantity(quantity, true);
 
 	}
 
 	private static void getUnitCost(String rowText) {
-		// TODO Auto-generated method stub
+		// Pattern pUnitCost1, pUnitCost2
+		
+		if(currentTrans == null){
+			return;
+		}
+		
+		Matcher m1 = pUntiCost1.matcher(rowText);
+		Matcher m2 = pUnitCost2.matcher(rowText);
+		
+		String unitCost = null;
+		
+		if(m1.matches()){
+			unitCost = m1.group(1);
+		}
+		else if(m2.matches()){
+			unitCost = m2.group(1);
+		}
+		
+		currentTrans.setAssetUnitCost(unitCost, true);
 
 	}
 
-	private static void getInterest(String rowText) {
-		// TODO Auto-generated method stub
+	private static void getInterest(String rowText) throws ParseException {
+		// Pattern pInterestAndDates
+		
+		if(currentTrans == null){
+			return;
+		}
+		
+		Matcher m = pInterestAndDates.matcher(rowText);
+		
+		if(m.matches()){
+			String startDate = m.group(1);
+			String maturity = m.group(2);
+			String coupon = m.group(3);
+			String accruedInterest = m.group(4);
+			
+			if(accruedInterest.contains("+")){
+				accruedInterest = accruedInterest.replace("+", "").trim();
+			}
+			
+			currentTrans.setStartDate(startDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY);
+			currentTrans.setMaturityDate(maturity, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY);
+			currentTrans.setCoupon(coupon, true);
+			currentTrans.setAccruedInterest(accruedInterest, true);
+		}
+		
 
 	}
 
 	private static void getTransactionLevies(String rowText) {
-		// TODO Auto-generated method stub
+		// Pattern pTransLevies1, pTransLevies2, pTransLevies3
+		if(currentTrans == null){
+			return;
+		}
+		
+		Matcher m1 = pTransLevies1.matcher(rowText);
+		Matcher m2 = pTransLevies2.matcher(rowText);
+		Matcher m3 = pTransLevies3.matcher(rowText);
+		Matcher m4 = pTransLevies4.matcher(rowText);
+		
+//		System.out.println(m1.matches() + " : " + m2.matches() + " : " + m3.matches());
+		
+		String levies = currentTrans.getBrokerageAndLevies();
+		double leviesD = 0;
+		
+		if(StringUtils.isNotEmpty(levies)){
+			leviesD = Double.parseDouble(levies);
+		}
+//		System.out.println(leviesD);
+		String amt  = null;
+		if(m1.matches()){
+			amt = m1.group(1);
+		}
+		else if(m2.matches()){
+			amt = m2.group(1);
+		}
+		else if(m3.matches()){
+			amt = m3.group(1);
+		}
+		else if(m4.matches()){
+			amt = m4.group(1);
+		}
+		
+		if(StringUtils.isNotEmpty(amt)){
+			amt = ParserUtility.formatAmount(amt);
+			double amtD = Double.parseDouble(amt);
+			amtD += leviesD;
+			currentTrans.setBrokerageAndLevies(amtD+"", true);
+		}
+		
 
 	}
 
 	private static void getStrikePrice(String rowText) {
-		// TODO Auto-generated method stub
+		// Pattern pStrikePrice
+		
+		if(currentTrans == null){
+			return;
+		}
+		
+		Matcher m = pStrikePrice.matcher(rowText);
+		
+		if(m.matches()){
+			String price = m.group(1);
+			currentTrans.setStrikePrice(price, true);
+		}
+		
 
 	}
 
-	private static void getExpiryDate(String rowText) {
-		// TODO Auto-generated method stub
+	private static void getExpiryDate(String rowText) throws ParseException {
+		// Pattern pExpiryDate
+		
+		if(currentTrans == null){
+			return;
+		}
+		
+		Matcher m = pExpiryDate.matcher(rowText);
+		
+		if(m.matches()){
+			String expiryDate = m.group(1);
+			currentTrans.setExpiryDate(expiryDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YYYY);
+		}
+		
 
 	}
 
-	private static void getStartAndMaturityDate(String rowText) {
-		// TODO Auto-generated method stub
-
-	}
 
 	private static void getCashAssets(InvestmentAccount account, WebDriver driver) {
 		// Cash Assets

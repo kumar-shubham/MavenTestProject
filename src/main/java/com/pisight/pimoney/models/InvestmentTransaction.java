@@ -46,6 +46,9 @@ public class InvestmentTransaction extends TransactionBase{
 	private String coupon = null;
 	private String accruedInterest = null;
 	private String dateFormat = null;
+	private String strikePrice = null;
+	private String expiryDate = null;
+	private String brokerageAndLevies = null;
 
 	/**
 	 * @return the accountNumber
@@ -481,6 +484,63 @@ public class InvestmentTransaction extends TransactionBase{
 	public void setAccruedInterest(String accruedInterest, boolean format) {
 		if(StringUtils.isNotEmpty(accruedInterest)){
 			this.accruedInterest = ParserUtility.formatAmount(accruedInterest);
+		}
+	}
+	/**
+	 * @return the strikePrice
+	 */
+	public String getStrikePrice() {
+		return strikePrice;
+	}
+	/**
+	 * @param strikePrice the strikePrice to set
+	 */
+	public void setStrikePrice(String strikePrice) {
+		if(StringUtils.isNotEmpty(strikePrice)){
+			this.strikePrice = strikePrice;
+		}
+	}
+	public void setStrikePrice(String strikePrice, boolean format) {
+		if(StringUtils.isNotEmpty(strikePrice)){
+			this.strikePrice = ParserUtility.formatAmount(strikePrice);
+		}
+	}
+	/**
+	 * @return the expiryDate
+	 */
+	public String getExpiryDate() {
+		return expiryDate;
+	}
+	/**
+	 * @param expiryDate the expiryDate to set
+	 */
+	public void setExpiryDate(String expiryDate) {
+		if(StringUtils.isNotEmpty(expiryDate)){
+			this.expiryDate = expiryDate;
+		}
+	}
+	public void setExpiryDate(String expiryDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(expiryDate)){
+			this.expiryDate = ParserUtility.convertToPimoneyDate(expiryDate, dateFormat);
+		}
+	}
+	/**
+	 * @return the brokerageAndLevies
+	 */
+	public String getBrokerageAndLevies() {
+		return brokerageAndLevies;
+	}
+	/**
+	 * @param brokerageAndLevies the brokerageAndLevies to set
+	 */
+	public void setBrokerageAndLevies(String brokerageAndLevies) {
+		if(StringUtils.isNotEmpty(brokerageAndLevies)){
+			this.brokerageAndLevies = brokerageAndLevies;
+		}
+	}
+	public void setBrokerageAndLevies(String brokerageAndLevies, boolean format) {
+		if(StringUtils.isNotEmpty(brokerageAndLevies)){
+			this.brokerageAndLevies = ParserUtility.formatAmount(brokerageAndLevies);
 		}
 	}
 	/**
