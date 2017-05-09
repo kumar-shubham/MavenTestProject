@@ -13,20 +13,92 @@ public class LL {
 
 		LL l = new LL();
 
-		ArrayList<Integer> list = new ArrayList<Integer>(Arrays.asList(36,46,26,92,73,42,89,67,70,52,27,68,84,50,31,32,47,16,63,101,64,77,44,96,76,4,58,30,8,33,43,22,79,13,51,82,6));
+		ArrayList<Integer> list = new ArrayList<Integer>(Arrays.asList(1,1));
 
-		ArrayList<Integer> list1 = new ArrayList<Integer>(Arrays.asList(1,1,2,3,4,5));
+		ArrayList<Integer> list1 = new ArrayList<Integer>(Arrays.asList(1,9,9,9));
 
-		ListNode root = l.create(list1);
+		ListNode root = l.create(list);
+		ListNode root1 = l.create(list1);
 		//		l.printList(root);
 		//		ListNode ans = l.reverseBetween(root, 13, 15);
 		//		l.printList(ans);
 
 //		ListNode ans = l.removeNthFromEnd(root, 82);
 //		l.printList(ans);
-		ListNode ans = l.rotateRight(root, 2);
+//		ListNode ans = l.rotateRight(root, 2);
+//		l.printList(ans);
+		
+		ListNode ans = l.addTwoNumbers(root, root1);
 		l.printList(ans);
 
+	}
+	
+	public ListNode addTwoNumbers(ListNode a, ListNode b) {
+	    
+		 if(a == null){
+		        return b;
+		    }
+		    if(b == null){
+		        return a;
+		    }
+		    
+		    boolean carry = false;
+		    
+		    ListNode temp1 = a;
+		    ListNode temp2 = b;
+		    ListNode prev = a;
+		    while(temp1 != null && temp2 != null){
+		        int x = temp1.val;
+		        int y = temp2.val;
+		        
+		        int val = x+y;
+		        if(carry){
+		            val++;
+		        }
+		        if(val>9){
+		            carry = true;
+		            temp1.val = val%10;
+		        }
+		        else{
+		            carry = false;
+		            temp1.val = val;
+		        }
+		        prev = temp1;
+		        temp1 = temp1.next;
+		        temp2 = temp2.next;
+		    }
+		    
+		    if(temp2 != null){
+		        prev.next = temp2;
+		        temp1 = temp2;
+		    }
+		    
+		    while(temp1 != null){
+		        int x = temp1.val;
+		        if(carry){
+		            x++;
+		        }
+		        if(x>9){
+		            carry = true;
+		            temp1.val = x%10;
+		        }
+		        else{
+		            carry = false;
+		            temp1.val = x;
+		        }
+		        prev = temp1;
+		        temp1 = temp1.next;
+		    }
+		    
+		    if(carry){
+		        ListNode node = new ListNode(1);
+		        prev.next = node;
+		        
+		    }
+		    
+		    
+		    return a;
+	    
 	}
 
 	public ListNode rotateRight(ListNode a, int b) {
