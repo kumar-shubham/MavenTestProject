@@ -19,7 +19,16 @@ public class B {
 		
 //		System.out.println(b.maxone(a, 2));
 		
-		System.out.println(b.minimize(a, c, d));
+//		System.out.println(b.minimize(a, c, d));
+		
+		System.out.println("kumar  ".hashCode());
+		System.out.println("kumar  ".hashCode());
+		System.out.println("kuma r ".hashCode());
+		System.out.println("k".hashCode());
+		System.out.println("u".hashCode());
+		System.out.println("m".hashCode());
+		System.out.println("a".hashCode());
+		System.out.println("r".hashCode());
 
 	}
 	
