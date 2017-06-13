@@ -46,7 +46,7 @@ public class MyClass {
 
 		PDFExtracter boxTest = null;
 		try{
-			boxTest = new PDFExtracter(getFile("investments/new", "820420 Account Statement 31.01.2017", "pdf"),"");
+			boxTest = new PDFExtracter(getFile("investments/done", "HSBC_SG_INV", "pdf"),"");
 		}catch(Exception e){
 			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
 				System.out.println("Cannot decrypt PDF, the password is incorrect");
@@ -58,7 +58,7 @@ public class MyClass {
 
 		js.executeScript(page);
 		try{
-			scrapeStatement(driver);
+//			scrapeStatement(driver);
 		}
 		catch(Exception e){
 			throw e;
