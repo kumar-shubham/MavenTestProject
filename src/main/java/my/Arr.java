@@ -3,6 +3,9 @@ package my;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Arr {
 
@@ -11,8 +14,10 @@ public class Arr {
 		
 		Arr a = new Arr();
 		ArrayList<Integer> A = new ArrayList<Integer>(Arrays.asList(-1, -7, 5, 7, -10, 8, 1, -1, -1, -3, -2, 2, 5, -7, -6, -1, 0, -8, -10, -9, -1, -4, 2, -9, -8, -10, 7, -7, -9, -9, -1, 0, -5, 6, -3, 7, 4, 0, -4, -6, 7, 4, -2, -5, 8, 2, -4, -10, -4, -4, 4, 6, 2, 8, -1, -4, 0, -3, 0, 1, -10, 1, 3, 7, -3, 2, -4, 4, 5, 2, 0, 2, 9, 0, -1, -1, 4, 5, -9, -10, 3, -3, -2, 8, -4, 0));
+		Set<List<Integer>> log = new HashSet<>();
 		
-		System.out.println(a.solve(A));
+		System.out.println(Character.forDigit(11, 10));
+//		System.out.println(a.solve(A));
 
 	}
 	
