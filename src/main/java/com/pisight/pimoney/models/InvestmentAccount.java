@@ -18,8 +18,8 @@ public class InvestmentAccount extends Container {
 	public InvestmentAccount(HashMap<String, String> properties){
 		setTag(Constants.TAG_INVESTMENT);
 		this.properties = properties;
-		String bankId = "" + properties.get(Constants.USER_ID) + properties.get(Constants.INSTITUTION_CODE);
-		setBankId("manual-" + bankId.hashCode());
+//		String bankId = "" + properties.get(Constants.USER_ID) + properties.get(Constants.INSTITUTION_CODE);
+//		setBankId("manual-" + bankId.hashCode());
 	}
 	
 	private HashMap<String, String> properties = new HashMap<String, String>();

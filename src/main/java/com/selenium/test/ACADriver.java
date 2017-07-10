@@ -133,7 +133,7 @@ public class ACADriver {
 				String mimeType = Files.probeContentType(files[0].toPath());
 				System.out.println(mimeType);
 				String fileName = files[0].getName();
-				if(mimeType != null && mimeType.toLowerCase().contains("mpeg") && fileName.toLowerCase().matches(".*\\.mp3")){
+				if(mimeType != null && mimeType.toLowerCase().contains("application/pdf") && fileName.toLowerCase().matches(".*\\.pdf")){
 					System.out.println("new filename -> " + tempFileLocation + fileName);
 					files[0].renameTo(new File(tempFileLocation + fileName));
 					directory.delete();

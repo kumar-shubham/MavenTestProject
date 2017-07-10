@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,6 @@ import com.pisight.pimoney.beans.ParserUtility;
 import com.pisight.pimoney.constants.Constants;
 import com.pisight.pimoney.models.HoldingAsset;
 import com.pisight.pimoney.models.InvestmentAccount;
-import com.pisight.pimoney.models.InvestmentTransaction;
 import com.pisight.pimoney.models.Response;
 
 public class MyClass {
@@ -46,7 +46,7 @@ public class MyClass {
 
 		PDFExtracter boxTest = null;
 		try{
-			boxTest = new PDFExtracter(getFile("investments/done", "HSBC_SG_INV", "pdf"),"");
+			boxTest = new PDFExtracter(getFile("investments", "new/statements 13-06-17/820420 Portfolio Statement", "pdf"),"");
 		}catch(Exception e){
 			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
 				System.out.println("Cannot decrypt PDF, the password is incorrect");
@@ -58,7 +58,7 @@ public class MyClass {
 
 		js.executeScript(page);
 		try{
-//			scrapeStatement(driver);
+			scrapeStatement(driver);
 		}
 		catch(Exception e){
 			throw e;
@@ -79,6 +79,7 @@ public class MyClass {
 
 		Path p = Paths.get(System.getProperty("user.home"), "kumar/statements/statements", fileName);
 
+		System.out.println(p.toString());
 		return p.toFile();
 	}
 
@@ -97,229 +98,25 @@ public class MyClass {
 		return driver;
 	}
 
-	private static String regexQuantity1 = "(?:.* )?Number of Shares: ((?:\\d*,)*\\d+\\.?\\d*)(?: .*)?";
-	private static String regexQuantity2 = "(?:.* )?You [A-z]+ ((?:\\d*,)*\\d+\\.?\\d*) Shares(?: .*)?";
-	private static String regexQuantity3 = "(?:.* )?Principal Amount: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	private static String regexQuantity4 = "[A-Z]{3} ((?:\\d*,)*\\d+\\.?\\d*) .*";
-	private static String regexQuantity5 = "((?:\\d*,)*\\d+\\.?\\d*) .*";
-	private static Pattern pQuantity1 = Pattern.compile(regexQuantity1);
-	private static Pattern pQuantity2 = Pattern.compile(regexQuantity2);
-	private static Pattern pQuantity3 = Pattern.compile(regexQuantity3);
-	private static Pattern pQuantity4 = Pattern.compile(regexQuantity4);
-	private static Pattern pQuantity5 = Pattern.compile(regexQuantity5);
 
-	private static String regexUnitCost1 = "(?:.* )?At the price of: ((?:\\d*,)*\\d+\\.?\\d*) ((?:[A-Z]{3})|(?:%))(?: .*)?";
-	private static String regexUnitCost2 = "(?:.* )?Premium per Share: ((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	private static Pattern pUntiCost1 = Pattern.compile(regexUnitCost1);
-	private static Pattern pUnitCost2 = Pattern.compile(regexUnitCost2);
-
-	private static String regexInterest = "(?:.* )?((?:\\d*,)*\\d+\\.?\\d*) ?%(?: .*)?";
-	private static Pattern pInterest = Pattern.compile(regexInterest);
-
-	private static String regexInterestAndDates = "(\\d{1,2}-\\d{2}-\\d{4}) - (\\d{1,2}-\\d{2}-\\d{4}) ((?:\\d*,)*\\d+\\.?\\d*) % .* ((?:\\+|-)?(?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}";
-	private static Pattern pInterestAndDates = Pattern.compile(regexInterestAndDates);
-
-	private static String regexTransLevies1 = "(?:.* )?Transaction Levy: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	private static String regexTransLevies2 = "(?:.* )?Brokerage / Commission: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	private static String regexTransLevies3 = "(?:.* )?GST .*\\): .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	private static String regexTransLevies4 = "(?:.* )?Trading Fee: .((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	private static Pattern pTransLevies1 = Pattern.compile(regexTransLevies1);
-	private static Pattern pTransLevies2 = Pattern.compile(regexTransLevies2);
-	private static Pattern pTransLevies3 = Pattern.compile(regexTransLevies3);
-	private static Pattern pTransLevies4 = Pattern.compile(regexTransLevies4);
-
-	private static String regexStrikePrice = "(?:.* )?Strike Price: ((?:\\d*,)*\\d+\\.?\\d*) [A-Z]{3}(?: .*)?";
-	private static Pattern pStrikePrice = Pattern.compile(regexStrikePrice);
-
-	private static String regexExpiryDate = "(?:.* )?Expiry Date/Time: (\\d{1,2}-[A-Z]{3}-\\d{4})(?: .*)?";
-	private static Pattern pExpiryDate= Pattern.compile(regexExpiryDate);
+	private static HoldingAsset currentAsset = null;
+	private static int rowCount = 0;
+	private static String txnCurrency = null;
+	private static String assetCategory = null;
+	private static String transType = null;
 
 
-	private static InvestmentTransaction currentTrans = null;
-	private static int rowCount = 0; // rowCount 1 for get second line description if present
 	public static void scrapeStatement(WebDriver driver) throws Exception{
 
 		HashMap<String, String> properties = new HashMap<String, String>();
 		Response response = new Response(properties);
 
-		System.out.println("#@#@#@#@##@#@##@#@#@##@#@#@#@#@##@#@#@#@#@#@##@#@#@#@#");
-		System.out.println("");
-
-		WebElement accountNumberEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Assets under custody')]]"));
-		String accountNumber = accountNumberEle.getText().trim();
-
-		String regex = "(?:.* )?(?:(\\d{8}\\.\\d{4}) - )Assets under custody(?: .*)?";
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(accountNumber);
-
-		if(m.matches()){
-			accountNumber = m.group(1);
-		}
-
-		WebElement stmtDateEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Value of holdings as at')]]"));
-		String stmtDate = stmtDateEle.getText().trim();
-
-		regex = "(?:.* )?Value of holdings as at (\\d{1,2}-\\d{1,2}-\\d{4})( .*)?";
-		p = Pattern.compile(regex);
-		m = p.matcher(stmtDate);
-
-		if(m.matches()){
-			stmtDate = m.group(1);
-		}
-
-		WebElement currencyEle = driver.findElement(By.xpath("//tr[td[contains(text() , 'Exchange rate on date of printing /')]]"));
-		String currency = currencyEle.getText().trim();
-
-		regex = "(?:.* )?Exchange rate on date of printing / ([A-Z]{3})( .*)?";
-		p = Pattern.compile(regex);
-		m = p.matcher(currency);
-
-		if(m.matches()){
-			currency = m.group(1);
-		}
-
-		InvestmentAccount account = new InvestmentAccount(properties);
-
-		account.setAccountNumber(accountNumber);
-		account.setCurrency(currency);
-		account.setBalance("0.00");
-		account.setAvailableBalance("0.00");
-		account.setBillDate(stmtDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY);
-		response.addInvestmentAccount(account);
-
-		getCashAssets(account, driver);
-
-		String transRegex = "(\\d{1,2}-\\d{2}-\\d{2}) (.*) \\| n°\\d+( .(?:\\d*,)*\\d+\\.?\\d*)?";
-		String currencyRegex1 = "Your current account l ([A-Z]{3})";
-		String currencyRegex2 = "Your contract position in ([A-Z]{3})";
-		String currencyRegex3 = "Currency ([A-Z]{3})";
-		p = Pattern.compile(transRegex);
-		Pattern pCur1 = Pattern.compile(currencyRegex1);
-		Pattern pCur2 = Pattern.compile(currencyRegex2);
-		Pattern pCur3 = Pattern.compile(currencyRegex3);
-
-		List<WebElement> rows = driver.findElements(By.xpath("//tr[td[text() = 'Your additional information']]/following-sibling::tr"));
-
-		String transCurrency = null;
-		for(WebElement row: rows){
-			String rowText = row.getText().trim();
-			System.out.println("RowText -> " + rowText);
-
-			if(rowText.contains("INTERIM BALANCE") || rowText.contains("PAGE") || rowText.contains("NEW BALANCE") 
-					|| rowText.contains("FORMER BALANCE")){
-				currentTrans = null;
-				continue;
-			}
-
-			m = p.matcher(rowText);
-			Matcher mCur1 = pCur1.matcher(rowText);
-			Matcher mCur2 = pCur2.matcher(rowText);
-			Matcher mCur3 = pCur3.matcher(rowText);
-
-			if(m.matches()){
-				System.out.println("## 1 ##");
-				rowCount = 1;
-				String transDate = m.group(1);
-				String description = m.group(2);
-				String amount = m.group(3);
-				String type = null;
-
-				if(StringUtils.isEmpty(amount)){
-					amount  = "0.00";
-					type = InvestmentTransaction.TRANSACTION_TYPE_SELL;
-				}
-				else if(amount.contains("+")){
-					amount = amount.replace("+", "").trim();
-					type = InvestmentTransaction.TRANSACTION_TYPE_SELL;
-				}
-				else if(amount.contains("-")){
-					type = InvestmentTransaction.TRANSACTION_TYPE_BUY;
-				}
-
-				InvestmentTransaction transaction = new InvestmentTransaction();
-
-				transaction.setAccountNumber(account.getAccountNumber());
-				transaction.setTransactionDate(transDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YY);
-				transaction.setDescription(description);
-				transaction.setAmount(amount, true);
-				transaction.setType(type);
-				transaction.setCurrency(transCurrency);
-				account.addTransaction(transaction);
-				currentTrans = transaction;
-			}
-			else if(rowText.matches("\\d{1,2}-\\d{2}-\\d{2}")){
-				System.out.println("## 2 ##");
-				rowCount = 1;
-				currentTrans.setValuationDate(rowText, Constants.DATEFORMAT_DD_DASH_MM_DASH_YY);
-			}
-			else if(mCur1.matches()){
-				System.out.println("## 3 ##");
-				transCurrency = mCur1.group(1);
-				rowCount = 0;
-			}
-			else if(mCur2.matches()){
-				System.out.println("## 4 ##");
-				transCurrency = mCur2.group(1);
-				rowCount = 0;
-			}
-			else if(mCur3.matches()){
-				System.out.println("## 5 ##");
-				transCurrency = mCur3.group(1);
-				rowCount = 0;
-			}
-			else if(currentTrans != null){
-				System.out.println("## 6 ##");
-				if(rowCount  == 1 && !rowText.contains(":")){
-					System.out.println("2^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^666");
-					String descRegex = "(.*) \\| ([A-Z]{2}\\w{8}\\d{2})";
-					Pattern pDesc = Pattern.compile(descRegex);
-					Matcher mDesc = pDesc.matcher(rowText);
-					Matcher mQuantity4 = pQuantity4.matcher(rowText);
-					Matcher mQuantity5 = pQuantity5.matcher(rowText);
-					Matcher mInterest = pInterest.matcher(rowText);
-					System.out.println(mDesc.matches() + " : " + mQuantity4.matches() + " : " + mQuantity5.matches() + " : " + mInterest.matches());
-					if(mDesc.matches()){
-						String description = mDesc.group(1);
-						String isin = mDesc.group(2);
-						description = description + " " + currentTrans.getDescription();
-						currentTrans.setDescription(description.trim());
-						currentTrans.setAssetISIN(isin);
-					}
-					else{
-						String description = rowText + " " + currentTrans.getDescription();
-						currentTrans.setDescription(description.trim());
-					}
-
-					if(mQuantity4.matches()){
-						String quantity = mQuantity4.group(1);
-						currentTrans.setAssetQuantity(quantity, true);
-					}
-					else if(mQuantity5.matches()){
-						String quantity = mQuantity5.group(1);
-						currentTrans.setAssetQuantity(quantity, true);
-					}
-
-					if(mInterest.matches()){
-						String coupon = mInterest.group(1);
-						currentTrans.setCoupon(coupon, true);
-					}
-					continue;
-				}
-				rowCount = 0;
-				getQuantity(rowText);
-				getUnitCost(rowText);
-				getInterest(rowText);
-				getTransactionLevies(rowText);
-				getStrikePrice(rowText);
-				getExpiryDate(rowText);
-			}
-
-		}
+		List<InvestmentAccount> accounts = getPortfolioStatement(driver, properties, response);
 
 		ObjectMapper mapper = new ObjectMapper();
 		Path path = Paths.get(System.getProperty("user.home"), "Documents", "bankStmt.json");
 		try {
-			mapper.writeValue(new File(path.toString()), account);
+			mapper.writeValue(new File(path.toString()), accounts);
 			//			String x = mapper.writeValueAsString(accounts);
 			//			JSONObject json = mapper.readValue(new File(p.toString()), JSONObject.class);
 			//			String xml = XML.toString(json);
@@ -336,197 +133,481 @@ public class MyClass {
 		}
 	}
 
-	private static void getQuantity(String rowText) {
-		// Pattern pQuantity1, pQuantity2, pQuantity3
+	private static List<InvestmentAccount> getPortfolioStatement(WebDriver driver, HashMap<String, String> properties, Response response) throws ParseException {
+		WebElement accNumEle = driver.findElement(By.xpath("//tr[td[contains(text(), 'PORTFOLIO STATEMENT')]]/following-sibling::tr[1]"));
+		String accNum = accNumEle.getText().trim();
 
-		if(currentTrans == null){
-			return;
-		}
-		Matcher m1 = pQuantity1.matcher(rowText);
-		Matcher m2 = pQuantity2.matcher(rowText);
-		Matcher m3 = pQuantity3.matcher(rowText);
+		accNum = accNum.substring(accNum.lastIndexOf(" "));
 		
+		WebElement currencyEle = driver.findElement(By.xpath("//td[contains(text(), 'Reference currency:')]"));
+		String currency = currencyEle.getText().trim();
 
-		String quantity = null;
-		if(m1.matches()){
-			quantity = m1.group(1);
-		}
-		else if(m2.matches()){
-			quantity = m2.group(1);
-		}
-		else  if(m3.matches()){
-			quantity = m3.group(1);
-		}
+		String regex = ".*Reference currency: ([A-Z]{3})( .*)?";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(currency);
 
-		currentTrans.setAssetQuantity(quantity, true);
-
-	}
-
-	private static void getUnitCost(String rowText) {
-		// Pattern pUnitCost1, pUnitCost2
-		
-		if(currentTrans == null){
-			return;
-		}
-		
-		Matcher m1 = pUntiCost1.matcher(rowText);
-		Matcher m2 = pUnitCost2.matcher(rowText);
-		
-		String unitCost = null;
-		
-		if(m1.matches()){
-			unitCost = m1.group(1);
-		}
-		else if(m2.matches()){
-			unitCost = m2.group(1);
-		}
-		
-		currentTrans.setAssetUnitCost(unitCost, true);
-
-	}
-
-	private static void getInterest(String rowText) throws ParseException {
-		// Pattern pInterestAndDates
-		
-		if(currentTrans == null){
-			return;
-		}
-		
-		Matcher m = pInterestAndDates.matcher(rowText);
-		
 		if(m.matches()){
-			String startDate = m.group(1);
-			String maturity = m.group(2);
-			String coupon = m.group(3);
-			String accruedInterest = m.group(4);
+			currency = m.group(1);
+		}
+
+		WebElement stmtDateEle = driver.findElement(By.xpath("//td[contains(text(), 'Statement date')]"));
+		String stmtDate = stmtDateEle.getText().trim();
+
+		regex = ".*Statement date (\\d{1,2}-\\d{2}-\\d{4})( .*)?";
+		p = Pattern.compile(regex);
+		m = p.matcher(stmtDate);
+
+		if(m.matches()){
+			stmtDate = m.group(1);
+		}
+
+		boolean isMultiplePortfolio = true;
+
+		if(accNum.contains(".")){
+			isMultiplePortfolio = false;
+		}
+
+		List<InvestmentAccount> accountList = new ArrayList<InvestmentAccount>();
+		if(isMultiplePortfolio){
+			accountList = getAccountsForMultiplePortfolio(driver, properties , accNum);
+		}
+		else{
+			accountList = getAccountForSinglePortfolio(driver, properties , accNum);
+		}
+
+		System.out.println("Account size ->>> " + accountList.size());
+		List<HoldingAsset> assets = new ArrayList<HoldingAsset>();
+		
+		int count = 0;
+		for(InvestmentAccount account: accountList){
+			getAssetType1(account, driver, isMultiplePortfolio, count);
+			getAssetType2(account, driver, isMultiplePortfolio, count);
+			getAssetType3(account, driver, isMultiplePortfolio, count);
 			
-			if(accruedInterest.contains("+")){
-				accruedInterest = accruedInterest.replace("+", "").trim();
+			if(isMultiplePortfolio){
+				account.setAccountNumber(accNum + "." + account.getAccountNumber());
 			}
-			
-			currentTrans.setStartDate(startDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY);
-			currentTrans.setMaturityDate(maturity, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY);
-			currentTrans.setCoupon(coupon, true);
-			currentTrans.setAccruedInterest(accruedInterest, true);
+			account.setCurrency(currency);
+			account.setBillDate(ParserUtility.convertToPimoneyDate(stmtDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY));
+			account.setAccountName("Portfolio - " + currency);
+			assets.addAll(account.getAssets());
+			count++;
 		}
 		
+		for(HoldingAsset asset: assets){
+			getDetailsFromDescription(asset);
+		}
+		
+		return accountList;
 
 	}
 
-	private static void getTransactionLevies(String rowText) {
-		// Pattern pTransLevies1, pTransLevies2, pTransLevies3
-		if(currentTrans == null){
-			return;
-		}
-		
-		Matcher m1 = pTransLevies1.matcher(rowText);
-		Matcher m2 = pTransLevies2.matcher(rowText);
-		Matcher m3 = pTransLevies3.matcher(rowText);
-		Matcher m4 = pTransLevies4.matcher(rowText);
-		
-//		System.out.println(m1.matches() + " : " + m2.matches() + " : " + m3.matches());
-		
-		String levies = currentTrans.getBrokerageAndLevies();
-		double leviesD = 0;
-		
-		if(StringUtils.isNotEmpty(levies)){
-			leviesD = Double.parseDouble(levies);
-		}
-//		System.out.println(leviesD);
-		String amt  = null;
-		if(m1.matches()){
-			amt = m1.group(1);
-		}
-		else if(m2.matches()){
-			amt = m2.group(1);
-		}
-		else if(m3.matches()){
-			amt = m3.group(1);
-		}
-		else if(m4.matches()){
-			amt = m4.group(1);
-		}
-		
-		if(StringUtils.isNotEmpty(amt)){
-			amt = ParserUtility.formatAmount(amt);
-			double amtD = Double.parseDouble(amt);
-			amtD += leviesD;
-			currentTrans.setBrokerageAndLevies(amtD+"", true);
-		}
-		
+	private static List<InvestmentAccount> getAccountsForMultiplePortfolio(WebDriver driver,
+			HashMap<String, String> properties, String portfolio) {
 
-	}
+		List<InvestmentAccount> accountList =  new ArrayList<InvestmentAccount>();
 
-	private static void getStrikePrice(String rowText) {
-		// Pattern pStrikePrice
-		
-		if(currentTrans == null){
-			return;
-		}
-		
-		Matcher m = pStrikePrice.matcher(rowText);
-		
-		if(m.matches()){
-			String price = m.group(1);
-			currentTrans.setStrikePrice(price, true);
-		}
-		
+		List<WebElement> accountListEle = driver.findElements(By.xpath("//tr/td[contains(text(), '. ASSETS UNDER CUSTODY - ')]"));
 
-	}
+		HashMap<String, Character> map = new HashMap<String, Character>();
 
-	private static void getExpiryDate(String rowText) throws ParseException {
-		// Pattern pExpiryDate
-		
-		if(currentTrans == null){
-			return;
-		}
-		
-		Matcher m = pExpiryDate.matcher(rowText);
-		
-		if(m.matches()){
-			String expiryDate = m.group(1);
-			currentTrans.setExpiryDate(expiryDate, Constants.DATEFORMAT_DD_DASH_MMM_DASH_YYYY);
-		}
-		
-
-	}
-
-
-	private static void getCashAssets(InvestmentAccount account, WebDriver driver) {
-		// Cash Assets
-
-		String regex = "(.*) ([A-Z]{3}) (\\d{8}\\.\\d{4}) .* (-?(?:\\d*,)*\\d+\\.?\\d*) \\d{1,2}";
+		String regex = ".*\\. ASSETS UNDER CUSTODY - (\\d{4})( .*)?";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = null;
 
-		List<WebElement> rows = driver.findElements(By.xpath("//tr[preceding-sibling::tr/td[text() = 'Your accounts with transactions'] and following-sibling::tr/td[text() = 'Your additional information']]"));
+		for(WebElement accountEle: accountListEle){
 
+			String text = accountEle.getText();
+			m = p.matcher(text);
+
+			if(m.matches()){
+				String accNum = m.group(1);
+				if(!map.containsKey(accNum)){
+					map.put(accNum, null);
+					InvestmentAccount account = new InvestmentAccount(properties);
+					account.setAccountNumber(accNum);
+					accountList.add(account);
+				}
+			}
+		}
+
+		return accountList;
+	}
+
+	private static List<InvestmentAccount> getAccountForSinglePortfolio(WebDriver driver,
+			HashMap<String, String> properties, String accNum) throws ParseException {
+
+		List<InvestmentAccount> accountList =  new ArrayList<InvestmentAccount>();
+
+		String xpath = "//tr[td[contains(text(), 'Value of holdings as at')]]/following-sibling::tr[2]";
+		WebElement balanceEle = driver.findElement(By.xpath(xpath));
+		String balance = balanceEle.getText().trim();
+
+		String regex = "(?:.* )?(-?(?:\\d*,)*\\d+\\.?\\d*)( .*)?";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(balance);
+
+		if(m.matches()){
+			balance = m.group(1);
+		}
+
+
+		InvestmentAccount account = new InvestmentAccount(properties);
+
+		account.setAccountNumber(accNum);
+		account.setBalance(ParserUtility.formatAmount(balance));
+		account.setAvailableBalance(ParserUtility.formatAmount(balance));
+
+		accountList.add(account);
+
+		return accountList;
+	}
+
+
+	private static void getDetailsFromDescription(HoldingAsset asset) {
+		// TODO Auto-generated method stub
+
+		String regex = "(?:.* )?([A-Z]{2}\\w{8}\\d{2})(?: .*)?";
+		Pattern p = Pattern.compile(regex);
+		if(StringUtils.isNotEmpty(asset.getHoldingAssetDescription())){
+			Matcher m = p.matcher(asset.getHoldingAssetDescription());
+
+			if(m.matches()){
+				String isin = m.group(1);
+				asset.setHoldingAssetISIN(isin);
+			}
+		}
+
+	}
+
+	private static void getAssetType1(InvestmentAccount account, WebDriver driver, boolean isMultiplePortfolio, int count) throws ParseException {
+		// TODO Auto-generated method stub
+		String regex = "([A-Z]{3})?(?: )?(.*) (-?(?:\\d*,)*\\d+\\.?\\d*)(?: (-?(?:\\d*,)*\\d+\\.?\\d*) %)?(?: (\\d{1,2}-\\d{2}-\\d{4}))?(?: (\\d{1,2}-\\d{2}-\\d{4}))? (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d{2}) %";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = null;
+
+		String xpath = "//tr[preceding-sibling::tr/td[text() = 'ASSETS UNDER CUSTODY : Cash'] and following-sibling::tr/td[contains(text() , 'TOTAL CASH ')]]";
+
+		if(isMultiplePortfolio){
+			xpath = "//tr[td[contains(text(), 'ASSETS UNDER CUSTODY - " + account.getAccountNumber() + " : Cash')]]/following-sibling::tr[count(preceding::td[contains(text(), 'TOTAL CASH')]) = " + count + "]";
+		}
+		List<WebElement> rows = driver.findElements(By.xpath(xpath));
+		
+		System.out.println("type ->> cash :: account number ->> " + account.getAccountNumber() + " :: count ->> " + count + " :: rowCount ->> " + rows.size());
+
+		HoldingAsset currentAsset = null;
+		String currentCurrency = null;
+		int rowCount = 0;
 		for(WebElement row: rows){
-			String rowText = row.getText().trim();
 
-			System.out.println("RowText -> " + rowText);
+			String rowText = row.getText().trim();
+			//System.out.println("RowText - > " + rowText);
 
 			m = p.matcher(rowText);
 
 			if(m.matches()){
-				String description = m.group(1);
-				String currency = m.group(2);
-				String quantity = m.group(4);
+				rowCount = 1;
+				String currency = m.group(1);
+				String description = m.group(2);
+				String quantity = m.group(3);
+				String coupon = m.group(4);
+				String startDate = m.group(5);
+				String maturity = m.group(6);
+				String fxValue = m.group(7);
 
-				description = description.replace("l", "").trim();
+				if(StringUtils.isEmpty(currency)){
+					currency = currentCurrency;
+				}
+				else{
+					currentCurrency = currency;
+				}
 
 				HoldingAsset asset = new HoldingAsset();
 
 				asset.setHoldingAssetAccountNumber(account.getAccountNumber());
-				asset.setHoldingAssetDescription(description);
 				asset.setHoldingAssetCurrency(currency);
-				asset.setHoldingAssetQuantity(quantity, true);
-				asset.setHoldingAssetCategory(HoldingAsset.CATEGORY_CASH);
+				asset.setHoldingAssetDescription(description);
+				asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
+				asset.setHoldingAssetCoupon(ParserUtility.formatAmount(coupon));
+				asset.setHoldingAssetStartDate(ParserUtility.convertToPimoneyDate(startDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY));
+				asset.setHoldingAssetMaturityDate(ParserUtility.convertToPimoneyDate(maturity, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY));
+				asset.setHoldingAssetFxMarketValue(ParserUtility.formatAmount(fxValue));
+
+				if(StringUtils.isEmpty(coupon)){
+					asset.setHoldingAssetCategory(HoldingAsset.CATEGORY_CASH);
+				}
+				else{
+					asset.setHoldingAssetCategory(HoldingAsset.CATEGORY_DEPOSIT);
+				}
 				account.addAsset(asset);
+				currentAsset = asset;
+			}
+			else if(currentAsset != null && rowCount == 1 && currentAsset.getHoldingAssetCategory().equals(HoldingAsset.CATEGORY_DEPOSIT)){
+
+				currentAsset.setHoldingAssetAccruedInterest(ParserUtility.formatAmount(rowText));
+				rowCount = 0;
+				currentAsset = null;
 			}
 
 		}
 
 	}
+
+	private static void getAssetType2(InvestmentAccount account, WebDriver driver, boolean isMultiplePortfolio, int count) throws ParseException {
+		// TODO Auto-generated method stub
+
+		String regex = "([A-Z]{3})?(?: )?(.*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) % (\\d{1,2}-\\d{2}-\\d{4}) (\\d{1,2}-\\d{2}-\\d{4}) (-?(?:\\d*,)*\\d+\\.?\\d*)";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = null;
+
+		String xpath = "//tr[preceding-sibling::tr/td[text() = 'ASSETS UNDER CUSTODY : Loans'] and following-sibling::tr/td[contains(text() , 'TOTAL LOANS ')]]";
+
+		if(isMultiplePortfolio){
+			xpath = "//tr[td[contains(text(), 'ASSETS UNDER CUSTODY - " + account.getAccountNumber() + " : Loans')]]/following-sibling::tr[count(preceding::td[contains(text(), 'TOTAL LOANS ')]) = " + count + "]";
+		}
+		List<WebElement> rows = driver.findElements(By.xpath(xpath));
+
+		System.out.println("type ->> loans :: account number ->> " + account.getAccountNumber() + " :: count ->> " + count + " :: rowCount ->> " + rows.size());
+		HoldingAsset currentAsset = null;
+		String currentCurrency = null;
+		int rowCount = 0;
+		for(WebElement row: rows){
+
+			String rowText = row.getText().trim();
+			//System.out.println("RowText - > " + rowText);
+
+			m = p.matcher(rowText);
+
+			if(m.matches()){
+				rowCount = 1;
+				String currency = m.group(1);
+				String description = m.group(2);
+				String quantity = m.group(3);
+				String coupon = m.group(4);
+				String startDate = m.group(5);
+				String maturity = m.group(6);
+				String fxValue = m.group(7);
+
+				if(StringUtils.isEmpty(currency)){
+					currency = currentCurrency;
+				}
+				else{
+					currentCurrency = currency;
+				}
+
+				HoldingAsset asset = new HoldingAsset();
+
+				asset.setHoldingAssetAccountNumber(account.getAccountNumber());
+				asset.setHoldingAssetCurrency(currency);
+				asset.setHoldingAssetDescription(description);
+				asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
+				asset.setHoldingAssetCoupon(ParserUtility.formatAmount(coupon));
+				asset.setHoldingAssetStartDate(ParserUtility.convertToPimoneyDate(startDate, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY));
+				asset.setHoldingAssetMaturityDate(ParserUtility.convertToPimoneyDate(maturity, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY));
+				asset.setHoldingAssetFxMarketValue(ParserUtility.formatAmount(fxValue));
+				asset.setHoldingAssetCategory(HoldingAsset.CATEGORY_LOAN);
+
+				account.addAsset(asset);
+				currentAsset = asset;
+			}
+			else if(currentAsset != null && rowCount == 1 && currentAsset.getHoldingAssetCategory().equals(HoldingAsset.CATEGORY_DEPOSIT)){
+
+				currentAsset.setHoldingAssetAccruedInterest(ParserUtility.formatAmount(rowText));
+				rowCount = 0;
+				currentAsset = null;
+			}
+
+		}
+
+	}
+
+	private static void getAssetType3(InvestmentAccount account, WebDriver driver, boolean isMultiplePortfolio, int count) throws ParseException {
+		// TODO Auto-generated method stub
+
+		String regex1 = "([A-Z]{3})?(?: )?(.*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) % (-?(?:\\d*,)*\\d+\\.?\\d*) % (-?(?:\\d*,)*\\d+\\.?\\d*) % (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) %";
+		String regex2 = "([A-Z]{3})?(?: )?(.*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) %";
+		String regex3 = "(.*) (-?(?:\\d*,)*\\d+\\.?\\d*)(?: (\\d{1,2}-\\d{2}-\\d{4}))? (-?(?:\\d*,)*\\d+\\.?\\d*) %(?: .{2,4})? (-?(?:\\d*,)*\\d+\\.?\\d*) % (-?(?:\\d*,)*\\d+\\.?\\d*)";
+		String regex4 = "(.*) (-?(?:\\d*,)*\\d+\\.?\\d*)(?: (\\d{1,2}-\\d{2}-\\d{4}))?(?: .{2,4})? (-?(?:\\d*,)*\\d+\\.?\\d*) % (-?(?:\\d*,)*\\d+\\.?\\d*)";
+		String regex5 = "(.*) (-?(?:\\d*,)*\\d+\\.?\\d*) (-?(?:\\d*,)*\\d+\\.?\\d*) %";
+		String regex6 = "(.*) (-?(?:\\d*,)*\\d+\\.?\\d*) %";
+		Pattern p1 = Pattern.compile(regex1);
+		Pattern p2 = Pattern.compile(regex2);
+		Pattern p3 = Pattern.compile(regex3);
+		Pattern p4 = Pattern.compile(regex4);
+		Pattern p5 = Pattern.compile(regex5);
+		Pattern p6 = Pattern.compile(regex6);
+		Matcher m1 = null;
+		Matcher m2 = null;
+		Matcher m3 = null;
+		Matcher m4 = null;
+		Matcher m5 = null;
+		Matcher m6 = null;
+
+		String xpath1 = "//tr[preceding-sibling::tr/td[text() = 'ASSETS UNDER CUSTODY : Bonds'] and following-sibling::tr/td[contains(text() , 'TOTAL BONDS ')]]";
+		String xpath2 = "//tr[preceding-sibling::tr/td[text() = 'ASSETS UNDER CUSTODY : Equities'] and following-sibling::tr/td[contains(text() , 'TOTAL EQUITIES ')]]";
+		String xpath3 = "//tr[preceding-sibling::tr/td[text() = 'ASSETS UNDER CUSTODY : Investment funds'] and following-sibling::tr/td[contains(text() , 'TOTAL INVESTMENT FUNDS ')]]";
+
+		if(isMultiplePortfolio){
+			xpath1 = "//tr[td[contains(text(), 'ASSETS UNDER CUSTODY - " + account.getAccountNumber() + " : Bonds')]]/following-sibling::tr[count(preceding::td[contains(text(), 'TOTAL BONDS ')]) = " + count + "]";
+			xpath2 = "//tr[td[contains(text(), 'ASSETS UNDER CUSTODY - " + account.getAccountNumber() + " : Equities')]]/following-sibling::tr[count(preceding::td[contains(text(), 'TOTAL EQUITIES ')]) = " + count + "]";
+			xpath3 = "//tr[td[contains(text(), 'ASSETS UNDER CUSTODY - " + account.getAccountNumber() + " : Investment funds')]]/following-sibling::tr[count(preceding::td[contains(text(), 'TOTAL INVESTMENT FUNDS ')]) = " + count + "]";
+
+		}
+		List<WebElement> rows = driver.findElements(By.xpath(xpath1));
+
+		rows.addAll(driver.findElements(By.xpath(xpath2)));
+		rows.addAll(driver.findElements(By.xpath(xpath3)));
+
+		System.out.println("type ->> bonds :: account number ->> " + account.getAccountNumber() + " :: count ->> " + count + " :: rowCount ->> " + rows.size());
+		HoldingAsset currentAsset = null;
+		String currentCurrency = null;
+		int rowCount = 0;
+		for(WebElement row: rows){
+
+			String rowText = row.getText().trim();
+			//System.out.println("RowText - > " + rowText);
+
+			if(rowText.contains(""))
+
+				m1 = p1.matcher(rowText);
+			m2 = p2.matcher(rowText);
+			m3 = p3.matcher(rowText);
+			m4 = p4.matcher(rowText);
+			m5 = p5.matcher(rowText);
+			m6 = p6.matcher(rowText);
+
+			if(m1.matches()){
+				rowCount = 1;
+
+				String currency = m1.group(1);
+				String description = m1.group(2);
+				String quantity = m1.group(3);
+				String coupon  = m1.group(4);
+				String unitPrice = m1.group(5);
+				String unitCost = m1.group(6);
+				String profit = m1.group(7);
+				String fxValue = m1.group(8);
+
+				if(StringUtils.isEmpty(currency)){
+					currency = currentCurrency;
+				}
+				else{
+					currentCurrency = currency;
+				}
+
+				HoldingAsset asset = new HoldingAsset();
+
+				asset.setHoldingAssetAccountNumber(account.getAccountNumber());
+				asset.setHoldingAssetCurrency(currency);
+				asset.setHoldingAssetDescription(description);
+				asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
+				asset.setHoldingAssetCoupon(ParserUtility.formatAmount(coupon));
+				asset.setHoldingAssetIndicativePrice(ParserUtility.formatAmount(unitPrice));
+				asset.setHoldingAssetAverageUnitCost(ParserUtility.formatAmount(unitCost));
+				asset.setHoldingAssetUnrealizedProfitLoss(ParserUtility.formatAmount(profit));
+				asset.setHoldingAssetUnrealizedProfitLossCurrency(account.getCurrency());
+				asset.setHoldingAssetFxMarketValue(ParserUtility.formatAmount(fxValue));
+				asset.setBondNature(true);
+				asset.setHoldingAssetCategory(HoldingAsset.CATEGORY_BOND);
+				account.addAsset(asset);
+				currentAsset = asset;
+
+			}
+			else if(m2.matches()){
+				rowCount = 1;
+
+				String currency = m2.group(1);
+				String description = m2.group(2);
+				String quantity = m2.group(3);
+				String unitPrice = m2.group(4);
+				String unitCost = m2.group(5);
+				String profit = m2.group(6);
+				String fxValue = m2.group(7);
+
+				if(StringUtils.isEmpty(currency)){
+					currency = currentCurrency;
+				}
+				else{
+					currentCurrency = currency;
+				}
+
+				HoldingAsset asset = new HoldingAsset();
+
+				asset.setHoldingAssetAccountNumber(account.getAccountNumber());
+				asset.setHoldingAssetCurrency(currency);
+				asset.setHoldingAssetDescription(description);
+				asset.setHoldingAssetQuantity(ParserUtility.formatAmount(quantity));
+				asset.setHoldingAssetIndicativePrice(ParserUtility.formatAmount(unitPrice));
+				asset.setHoldingAssetAverageUnitCost(ParserUtility.formatAmount(unitCost));
+				asset.setHoldingAssetUnrealizedProfitLoss(ParserUtility.formatAmount(profit));
+				asset.setHoldingAssetUnrealizedProfitLossCurrency(account.getCurrency());
+				asset.setHoldingAssetFxMarketValue(ParserUtility.formatAmount(fxValue));
+				asset.setHoldingAssetCategory(HoldingAsset.CATEGORY_UNIT_TRUST__MUTUAL_FUND);
+				account.addAsset(asset);
+				currentAsset = asset;
+
+			}
+			else if(m3.matches() && currentAsset != null  && rowCount == 1){
+				rowCount ++;
+
+				String description = m3.group(1);
+				String maturity = m3.group(3);
+				String accruedInterest = m3.group(5);
+
+				description = currentAsset.getHoldingAssetDescription() + " " + description;
+
+				currentAsset.setHoldingAssetDescription(description);
+				currentAsset.setHoldingAssetMaturityDate(ParserUtility.convertToPimoneyDate(maturity, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY));
+				currentAsset.setHoldingAssetAccruedInterest(ParserUtility.formatAmount(accruedInterest));
+
+			}
+			else if(m4.matches() && currentAsset != null  && rowCount == 1){
+				rowCount ++;
+
+				String description = m4.group(1);
+				String maturity = m4.group(3);
+				String accruedInterest = m4.group(4);
+
+				description = currentAsset.getHoldingAssetDescription() + " " + description;
+
+				currentAsset.setHoldingAssetDescription(description);
+				currentAsset.setHoldingAssetMaturityDate(ParserUtility.convertToPimoneyDate(maturity, Constants.DATEFORMAT_DD_DASH_MM_DASH_YYYY));
+				currentAsset.setHoldingAssetAccruedInterest(ParserUtility.formatAmount(accruedInterest));
+
+
+			}
+			else if(m5.matches() && currentAsset != null  && rowCount == 1){
+				rowCount ++;
+
+				String description = m5.group(1);
+
+				description = currentAsset.getHoldingAssetDescription() + " " + description;
+
+				currentAsset.setHoldingAssetDescription(description);
+
+			}
+			else if(m6.matches() && currentAsset != null  && rowCount == 1){
+				rowCount ++;
+
+				String description = m6.group(1);
+
+				description = currentAsset.getHoldingAssetDescription() + " " + description;
+
+				currentAsset.setHoldingAssetDescription(description);
+
+			}
+			else if(currentAsset != null  && rowCount > 1){
+
+				if(rowText.matches(".*[A-Z]{2}\\w{8}\\d{2}.*")){
+
+					String description = currentAsset.getHoldingAssetDescription() + " " + rowText;
+
+					currentAsset.setHoldingAssetDescription(description);
+				}
+				rowCount = 0;
+			}
+		}
+	}
+
 
 }
