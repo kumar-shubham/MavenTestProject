@@ -2,6 +2,7 @@ package com.pisight.pimoney1.beans;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -46,7 +47,7 @@ public class MyClass {
 
 		PDFExtracter boxTest = null;
 		try{
-			boxTest = new PDFExtracter(getFile("investments", "new/statements 13-06-17/820420 Portfolio Statement", "pdf"),"");
+			boxTest = new PDFExtracter(getFile("investments/new/statements-18-06-17", "AH Ord Minnett Statement as of 31 May 2017", "pdf"),"");
 		}catch(Exception e){
 			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
 				System.out.println("Cannot decrypt PDF, the password is incorrect");
@@ -58,7 +59,7 @@ public class MyClass {
 
 		js.executeScript(page);
 		try{
-			scrapeStatement(driver);
+//			scrapeStatement(driver);
 		}
 		catch(Exception e){
 			throw e;
@@ -73,13 +74,14 @@ public class MyClass {
 
 	}
 
-	private static File getFile(String dir, String name, String type) {
+	private static File getFile(String dir, String name, String type) throws IOException {
 
 		String fileName = dir + "/" + name + "." + type.toLowerCase();
 
 		Path p = Paths.get(System.getProperty("user.home"), "kumar/statements/statements", fileName);
 
 		System.out.println(p.toString());
+		System.out.println(Files.probeContentType(p));
 		return p.toFile();
 	}
 

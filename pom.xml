@@ -48,10 +48,8 @@
 		</dependency>
 
 
-		<!-- <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-rest</artifactId> 
+			</dependency> -->
 
 		<dependency>
 			<groupId>log4j</groupId>
@@ -80,7 +78,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
 		</dependency>
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 			<version>3.0.0-beta2</version>
@@ -94,8 +92,8 @@
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-server</artifactId>
 			<version>2.53.1</version>
-		</dependency> -->
-		
+		</dependency>
+		<!-- for online -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
@@ -116,16 +114,13 @@
 			<artifactId>selenium-api</artifactId>
 			<version>2.53.1</version>
 		</dependency>
-		
-		<!-- <dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-api</artifactId>
-			<version>2.53.1</version>
-		</dependency> -->
+
+		<!-- <dependency> <groupId>org.seleniumhq.selenium</groupId> <artifactId>selenium-api</artifactId> 
+			<version>2.53.1</version> </dependency> -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.6.0</version><!--$NO-MVN-MAN-VER$-->
+			<version>2.6.0</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
 		<dependency>
 			<groupId>net.sf.cssbox</groupId>
@@ -173,11 +168,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-vision</artifactId>
@@ -187,6 +182,11 @@
 			<groupId>com.asprise.ocr</groupId>
 			<artifactId>java-ocr-api</artifactId>
 			<version>[15,)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20160810</version>
 		</dependency>
 	</dependencies>
 

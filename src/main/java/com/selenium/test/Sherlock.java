@@ -8,10 +8,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -454,7 +456,16 @@ public class Sherlock {
 			ScriptLogger.writeError("WebDriver exception raised");
 		}
 	}
-
+	
+	public void hoverOnElement(WebElement element){
+		Actions builder = new Actions(driver);
+		builder.moveToElement(element).build().perform();
+	}
+	
+	public void sendInput(WebElement element, String value){
+		element.sendKeys(Keys.chord(Keys.CONTROL, "a"), value);
+	}
+	
 	/**
 	 * This will close the contract between you and Sherlock and of course the driver(WebDriver).
 	 */

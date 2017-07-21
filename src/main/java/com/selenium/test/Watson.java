@@ -6,7 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -908,7 +910,7 @@ public class Watson {
 		String downloadFileLocation = sherlock.getDownloadFileLocation();
 
 		int downloadTimeOutInSec = sherlock.getDownloadTimeOutInSec();
-		
+
 		String tempFileLocation = System.getProperty("user.home") + "/public/tmp/";
 		String randomString = RandomStringUtils.randomAlphanumeric(8);
 		tempFileLocation += randomString + "/";
@@ -917,7 +919,7 @@ public class Watson {
 		if(!directory.exists()){
 			directory.mkdirs();
 		}
-		
+
 		File tempDirectory = new File(tempFileLocation);
 		if(!tempDirectory.exists()){
 			tempDirectory.mkdirs();
@@ -1010,6 +1012,30 @@ public class Watson {
 
 		return byInstance;
 
+	}
+
+	public static void switchToNewWindow(Sherlock sherlock){
+
+		WebDriver driver = sherlock.getDriverObject();
+		String parent=driver.getWindowHandle();
+
+		// This will return the number of windows opened by Webdriver and will return Set of Strings
+		Set<String>s1=driver.getWindowHandles();
+
+		// Now we will iterate using Iterator
+		Iterator<String> I1= s1.iterator();
+
+		while(I1.hasNext())
+		{
+			String child_window=I1.next();
+
+			// Here we will compare if parent window is not equal to child window then we            will close
+
+			if(!parent.equals(child_window))
+			{
+				driver.switchTo().window(child_window);
+			}
+		}
 	}
 
 }

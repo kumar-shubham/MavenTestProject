@@ -31,22 +31,22 @@ public class GoogleOCR1 {
 
 	private static final String LINE_SEPARATOR			=	"</td></tr><tr><td>";
 
-//	public static void main(String[] args) {
-//		// TODO Auto-generated method stub
-//
-//
-//		String result = getHTML(getFile("imagine","oie_11151925bP1Z3fX2", "png"));
-//		
-//		result = TABLE_OPENING + result + TABLE_CLOSING;
-//		
-//		System.out.println("page ->>> " + result);
-//
-//
-//
-//	}
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+
+		String result = getHTML(getFile("images","IMG_3659", "JPG"));
+		
+		result = TABLE_OPENING + result + TABLE_CLOSING;
+		
+		System.out.println("page ->>> " + result);
+
+
+
+	}
 
 	public static String getHTML(File file){
-		String ocrURL = "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDhSGVyNV5u86n7CTOvDhgC59TJFYTvVSI";
+		String ocrURL = "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyC3K1d02FWbOeIMPYa_I7sFkOAsZmsbU0w";
 
 		String result = "";
 		String resultText = "";
@@ -67,7 +67,7 @@ public class GoogleOCR1 {
 			e.printStackTrace();
 		}
 
-		String json = "{\"requests\":[{\"image\":{\"content\":\"" + encodedBase64 + "\"},\"features\":[{\"type\":\"TEXT_DETECTION\"}]}]}";
+		String json = "{\"requests\":[{\"image\":{\"content\":\"" + encodedBase64 + "\"},\"imageContext\":{\"languageHints\":[\"en\", \"mr\"]},\"features\":[{\"type\":\"TEXT_DETECTION\"}]}]}";
 		try {
 			HttpPost request = new HttpPost(ocrURL);
 			StringEntity params = new StringEntity(json);
@@ -83,7 +83,7 @@ public class GoogleOCR1 {
 				result += " " + in.next();
 
 			}
-//			System.out.println("-->> " + result);
+			System.out.println("-->> " + result);
 
 			
 			JSONObject jsonObject = new JSONObject(result);
@@ -175,7 +175,7 @@ public class GoogleOCR1 {
 	private static File getFile(String dir, String name, String type) {
 		// TODO Auto-generated method stub
 
-		String fileName = dir + "/" + name + "." + type.toLowerCase();
+		String fileName = dir + "/" + name + "." + type;
 		System.out.println("FFFFFFFFFFFFFFFFFFFFFF  ::: " + fileName);
 
 		Path p = Paths.get(System.getProperty("user.home"), "kumar", fileName);
