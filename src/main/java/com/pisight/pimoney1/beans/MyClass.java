@@ -1,6 +1,10 @@
 package com.pisight.pimoney1.beans;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -25,8 +30,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pisight.pimoney.beans.ACAHttpClient;
 import com.pisight.pimoney.beans.ParserUtility;
 import com.pisight.pimoney.constants.Constants;
+import com.pisight.pimoney.dto.ACAParserResponse;
 import com.pisight.pimoney.models.HoldingAsset;
 import com.pisight.pimoney.models.InvestmentAccount;
 import com.pisight.pimoney.models.Response;
@@ -46,8 +53,12 @@ public class MyClass {
 
 
 		PDFExtracter boxTest = null;
+		
+		String folder = "investments/done";
+		String filename = "scb3";
+		
 		try{
-			boxTest = new PDFExtracter(getFile("investments/new/statements-18-06-17", "AH Ord Minnett Statement as of 31 May 2017", "pdf"),"");
+			boxTest = new PDFExtracter(getFile(folder, filename, "pdf"),"");
 		}catch(Exception e){
 			if(e.getMessage().contains("Cannot decrypt PDF, the password is incorrect")){
 				System.out.println("Cannot decrypt PDF, the password is incorrect");
@@ -56,10 +67,28 @@ public class MyClass {
 		}
 
 		String page = boxTest.convertPDFToHTML(" ");
+		
+		Path htmlfilepath = Paths.get(System.getProperty("user.home"), "Documents/html/", filename + ".html");
+		
+		String fileName = folder + "/" + filename + ".pdf" ;
 
+		Path p = Paths.get(System.getProperty("user.home"), "kumar/statements/statements", fileName);
+		
 		js.executeScript(page);
+		
+		writeFile(htmlfilepath.toString(), driver.getPageSource());
+		
 		try{
 //			scrapeStatement(driver);
+			ACAParserResponse response = callParser("SG", "Standard Chartered Bank", p.toString());
+			System.out.println();
+			System.out.println();
+			System.out.println("asset xml");
+			System.out.println(response.getXmlAsset());
+			System.out.println();
+			System.out.println();
+			System.out.println("transaction xml");
+			System.out.println(response.getXmlTrans());
 		}
 		catch(Exception e){
 			throw e;
@@ -70,8 +99,13 @@ public class MyClass {
 
 			System.out.println("Total Time Taken -> " + (System.currentTimeMillis()-start) + " ms");
 		}
-
-
+	}
+	
+	public static void writeFile(String filepath, String output) throws FileNotFoundException, IOException{
+		FileWriter ofstream = new FileWriter(filepath);
+		try (BufferedWriter out = new BufferedWriter(ofstream)) {
+			out.write(output);
+		}
 	}
 
 	private static File getFile(String dir, String name, String type) throws IOException {
@@ -98,6 +132,59 @@ public class MyClass {
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 
 		return driver;
+	}
+	
+	
+	private static ACAParserResponse callParser(String locale, String parser, String filepath) throws Exception{
+
+		String docByte = getBase64(filepath);
+
+		String url = "http://192.168.0.15:8082/parse";
+
+		ACAHttpClient client = new ACAHttpClient(url, ACAHttpClient.REQUEST_TYPE_POST);
+
+		client.setContentType(ACAHttpClient.CONTENT_TYPE_JSON);
+
+		client.setDataField("locale", locale);
+		client.setDataField("name", parser);
+		client.setDataField("docByte", docByte);
+
+		String result = client.getResponseForPostRequest();
+
+		ObjectMapper mapper = new ObjectMapper();
+		
+		ACAParserResponse pr = mapper.readValue(result, ACAParserResponse.class);
+
+		return pr;
+
+	}
+	
+	private static String getBase64(String filepath) throws IOException{
+		File originalFile = new File(filepath);
+		String encodedBase64 = null;
+		FileInputStream fileInputStreamReader = null;
+		try {
+			fileInputStreamReader = new FileInputStream(originalFile);
+			byte[] bytes = new byte[(int)originalFile.length()];
+			fileInputStreamReader.read(bytes);
+			encodedBase64 = Base64.encodeBase64String(bytes);
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found while parsing statement");
+		} catch (IOException e) {
+			System.out.println("IO Exception ");
+		} finally{
+			if(fileInputStreamReader != null){
+				fileInputStreamReader.close();
+			}
+		}
+		
+		/*if(originalFile != null){
+			File directory = originalFile.getParentFile();
+			originalFile.delete();
+			directory.delete();
+		}*/
+
+		return encodedBase64;
 	}
 
 
