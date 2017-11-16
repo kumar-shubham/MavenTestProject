@@ -54,8 +54,8 @@ public class MyClass {
 
 		PDFExtracter boxTest = null;
 		
-		String folder = "investments/done";
-		String filename = "scb3";
+		String folder = "investments/new";
+		String filename = "IPG UBS Statement as of 31 October 2017";
 		
 		try{
 			boxTest = new PDFExtracter(getFile(folder, filename, "pdf"),"");
@@ -80,7 +80,7 @@ public class MyClass {
 		
 		try{
 //			scrapeStatement(driver);
-			ACAParserResponse response = callParser("SG", "Standard Chartered Bank", p.toString());
+			ACAParserResponse response = callParser("SG", "UBS", p.toString());
 			System.out.println();
 			System.out.println();
 			System.out.println("asset xml");
