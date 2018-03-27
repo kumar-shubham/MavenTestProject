@@ -1,12 +1,17 @@
 package com.pisight.pimoney.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public abstract class TransactionBase {
+public abstract class TransactionBase implements Cloneable, Serializable{
 	
-	private String fingerprint = null;
+	private static final long serialVersionUID = -7878045669075607735L;
 
-	protected HashMap<String, String> properties = new HashMap<String, String>();
+	private String fingerprint = null;
+	
+	private String transactionHash = null;
+
+	private HashMap<String, String> properties = new HashMap<String, String>();
 	
 	/**
 	 * @return the fingerprint
@@ -35,8 +40,27 @@ public abstract class TransactionBase {
 	public void setProperties(HashMap<String, String> properties) {
 		this.properties = properties;
 	}
-	
-	
-	
 
+	/**
+	 * @return the transactionHash
+	 */
+	public String getTransactionHash() {
+		return transactionHash;
+	}
+
+	/**
+	 * @param transactionHash the transactionHash to set
+	 */
+	public void setTransactionHash(String transactionHash) {
+		this.transactionHash = transactionHash;
+	}
+	
+	public Object clone()throws CloneNotSupportedException{  
+		return super.clone();  
+	}
+	
+	public abstract String getTag();
+	
+	public void setTag(String tag) {};
+	
 }

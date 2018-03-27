@@ -1,20 +1,39 @@
 package com.pisight.pimoney1.beans;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class Test {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		
-		String regex = "(.*) (\\d{4}.\\d{4}.\\d{4}.\\d{4}) (.*) ((\\d*,)?\\d+(\\.)\\d+) ((\\d*,)?\\d+(\\.)\\d+)";
-		String text = "UOB PRVI MILES 5522-5320-5010-6038 ANSHU SINHA 1,599.38 50.00";
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(text);
+		String connectionTestCommand = "pwd | tee -a /home/kumar/Desktop/a.out";
+		System.out.println("Connection Test Command = " + connectionTestCommand);
 		
-		System.out.println(m.matches());
-
+		ProcessBuilder builder = new ProcessBuilder("sh", "/home/kumar/Desktop/test.sh");
+		builder.redirectOutput(new File("/home/kumar/Desktop/a.out"));
+		builder.redirectError(new File("/home/kumar/Desktop/a.out"));
+		Process p1 = builder.start(); // may throw IOException
+		
+		p1.waitFor();
+		
+		FileInputStream fis = new FileInputStream("/home/kumar/Desktop/a.out");
+		fis.getChannel().position(0);
+        BufferedReader br=new BufferedReader(new InputStreamReader(fis));    
+        int i;    
+        String output2 = "";
+        while((i=br.read())!=-1){  
+        output2 += (char) i;
+        }  
+        br.close();
+        fis.close();
+		
+		System.out.println( "output =>  " + output2);
 	}
 
 }

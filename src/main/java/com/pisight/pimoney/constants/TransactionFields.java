@@ -1,0 +1,92 @@
+package com.pisight.pimoney.constants;
+
+public class TransactionFields {
+	
+	public static final String KEY_TRANS_DATE = "TransDate";
+	public static final String KEY_POST_DATE = "PostDate";
+	public static final String KEY_DESCRIPTION = "Description";
+	public static final String KEY_AMOUNT = "Amount";
+	public static final String KEY_RUNNING_BALANCE = "RunningBalance";
+	public static final String KEY_TRANSACTION_TYPE = "TransactionType";
+	public static final String KEY_SUB_ACCOUNT_NUMBER = "SubAccountNumber";
+	public static final String KEY_TYPE = "Type";
+	public static final String KEY_TRANSACTION_DATE = "TransactionDate";
+	public static final String KEY_ASSET_CATEGORY = "AssetCategory";
+	public static final String KEY_ASSET_NAME = "AssetName";
+	public static final String KEY_ASSET_MARKET = "AssetMarket";
+	public static final String KEY_ASSET_INSTRUMENT = "AssetInstrument";
+	public static final String KEY_ASSET_YIELD = "AssetYield";
+	public static final String KEY_ASSET_QUANTITY = "AssetQuantity";
+	public static final String KEY_ASSET_UNIT_COST = "AssetUnitCost";
+	public static final String KEY_ASSET_COST = "AssetCost";
+	public static final String KEY_ASSET_TRADE_DATE = "AssetTradeDate";
+	public static final String KEY_ASSET_CUSTODIAN = "AssetCustodian";
+	public static final String KEY_ASSET_ISSUER = "AssetIssuer";
+	public static final String KEY_ASSET_ISIN = "AssetISIN";
+	public static final String KEY_VALUATION_DATE = "ValuationDate";
+	public static final String KEY_START_DATE = "StartDate";
+	public static final String KEY_MATURITY_DATE = "MaturityDate";
+	public static final String KEY_COUPON = "Coupon";
+	public static final String KEY_ACCRUED_INTEREST = "AccruedInterest";
+	public static final String KEY_STRIKE_PRICE = "StrikePrice";
+	public static final String KEY_EXPIRY_DATE = "ExpiryDate";
+	public static final String KEY_BROKRAGE_N_LEVIES = "BrokerageAndLevies";
+	
+	public static final String KEY_TRANS_CODE = "TransCode";
+	public static final String KEY_ASSET_COST_DATE = "AssetCostDate";
+	public static final String KEY_CLOSING_METHOD_CODE = "ClosingMethodCode";
+	public static final String KEY_VERSUS_DATE = "VersusDate";
+	public static final String KEY_SRC_DST_TYPE = "SrcDstType";
+	public static final String KEY_SRC_DST_SYMBOL = "SrcDstSymbol";
+	public static final String KEY_TRADE_DATE_FX_RATE = "TradeDateFxRate";
+	public static final String KEY_VALUATION_DATE_FX_RATE = "ValuationDateFxRate";
+	public static final String KEY_ASSET_ORIGINAL_FX_RATE = "AssetOriginalFxRate";
+	public static final String KEY_MARK_TO_MARKET = "MarkToMarket";
+	public static final String KEY_ASSET_MTM = "AssetMTM";
+	public static final String KEY_ASSET_WITHHOLDING_TAX = "AssetWithholdingTax";
+	public static final String KEY_EXCHANGE = "Exchange";
+	public static final String KEY_EXCHANGE_FEE = "ExchangeFee";
+	public static final String KEY_COMMISSION = "Commission";
+	public static final String KEY_OTHER_FEES = "OtherFees";
+	public static final String KEY_IMPLIED_COMMISSION = "ImpliedCommission";
+	public static final String KEY_COMMISSION_PURPOSE = "CommissionPurpose";
+	public static final String KEY_ASSET_PLEDGE = "AssetPledge";
+	public static final String KEY_DESTINATION_PLEDGE = "DestinationPledge";
+	public static final String KEY_DESTINATION_CUSTODIAN = "DestinationCustodian";
+	public static final String KEY_ASSET_DURATION = "AssetDuration";
+	public static final String KEY_RECORD_DATE = "RecordDate";
+	public static final String KEY_STRATEGY = "Strategy";
+	public static final String KEY_RECLAIM_AMOUNT = "ReclaimAmount";
+	public static final String KEY_ACCRUAL_ACCOUNT = "AccrualAccount";
+	public static final String KEY_DIVIDEND_ACCRUAL_METHOD = "DividendAccrualMethod";
+	public static final String KEY_MGMT_FEE_PERIOD_DATE = "MgmtFeePeriodDate";
+	public static final String KEY_SHORT_POSITIONS = "ShortPositions";
+	public static final String KEY_DIVIDEND_STATUS = "DividendStatus";
+	public static final String KEY_RECALLABLE = "Recallable";
+	public static final String KEY_BROKER_FIRM_SYMBOL = "BrokerFirmSymbol";
+	public static final String KEY_COMMITTED_CAPITAL = "CommittedCapital";
+	public static final String KEY_CONTRIBUTED_CAPITAL = "ContributedCapital";
+	
+	//some more new fields
+	public static final String KEY_SECURITY_TYPE = "SecurityType";
+	public static final String KEY_SECURITY_ID = "SecurityId";
+	public static final String KEY_DEST_CURRENCY = "DestinationCurrency";
+	public static final String KEY_ASSET_TICKER = "AssetTicker";
+	public static final String KEY_ASSET_CUSIP = "AssetCUSIP";
+	public static final String KEY_ASSET_SEDOL = "AssetSEDOL";
+	public static final String KEY_ASSET_QUIK = "AssetQUIK";
+	public static final String KEY_FX_DENOMINATOR_CURRENCY = "FxDenominatorCurrency";
+	public static final String KEY_FX_NUMERATOR_CURRENCY = "FxNumeratorCurrency";
+	public static final String KEY_UNDER_BLOOMBERG_TICKER = "UnderBloombergTicker";
+	public static final String KEY_UNDER_CUSIP = "UnderCUSIP";
+	public static final String KEY_UNDER_ISIN = "UnderISIN";
+	public static final String KEY_UNDER_RIC = "UnderRIC";
+	public static final String KEY_UNDER_SEDOL = "UnderSEDOL";
+	public static final String KEY_UNDER_TICKER = "UnderTicker";
+	public static final String KEY_PRICE_FACTOR = "PriceFactor";
+	public static final String KEY_BASE_PRICE = "BasePrice";
+	public static final String KEY_ACCOUNT_CURRENCY = "AccountCurrency";
+	public static final String KEY_SETTLEMENT_CURRENCY = "SettlementCurrency";
+	public static final String KEY_CORP_ACTIONS_INDICATOR = "CorpActionsIndicator";
+
+}

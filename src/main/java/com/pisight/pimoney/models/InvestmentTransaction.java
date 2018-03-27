@@ -1,17 +1,20 @@
 package com.pisight.pimoney.models;
 
+import java.io.Serializable;
 import java.text.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.pisight.pimoney.beans.ParserUtility;
+import com.pisight.pimoney.constants.Constants;
+import com.pisight.pimoney.util.AccountUtil;
 
 /**
  * @author kumar
  *
  */
-public class InvestmentTransaction extends TransactionBase{
+public class InvestmentTransaction extends TransactionBase implements Serializable{
 
+	private static final long serialVersionUID = 2994692020037960284L;
 	public static final String TRANSACTION_TYPE_DEBIT = "debit";
 	public static final String TRANSACTION_TYPE_CREDIT = "credit";
 
@@ -22,31 +25,32 @@ public class InvestmentTransaction extends TransactionBase{
 	public static final String TRANSACTION_TYPE_INFLOW = "Inflow";
 	public static final String TRANSACTION_TYPE_OUTFLOW = "Outflow";
 
+	private static final String tag = Constants.TAG_INVESTMENT;
 
-	private String accountNumber = null;
+	private String accountNumber = "tbd";
 	private String subAccountNumber = null;
 	private String currency = null;
 	private String type = null;
 	private String amount = null;
-	private String transactionDate = null;
-	private String postDate = null;
-	private String description = null;
+	private String transactionDate = "tbd";
+	private String postDate = "tbd";
+	private String description = "tbd";
 	private String assetCategory = null;
 	private String assetName = null;
 	private String assetMarket = null;
 	private String assetInstrument = null;
 	private String assetYield = null;
-	private String assetQuantity = null;
+	private String assetQuantity = "tbd";
 	private String assetUnitCost = null;
 	private String assetCost = null;
 	private String assetTradeDate = null;
 	private String assetCustodian = null;
 	private String assetIssuer = null;
-	private String assetISIN = "tbd";
+	private String assetISIN = null;
 	private String valuationDate = null;
-	private String startDate = null;
-	private String maturityDate = null;
-	private String coupon = null;
+	private String startDate = "tbd";
+	private String maturityDate = "tbd"; // Mail Date = 29th Aug 2017
+	private String coupon = "tbd";
 	private String accruedInterest = null;
 	private String dateFormat = null;
 	private String strikePrice = null;
@@ -251,119 +255,119 @@ public class InvestmentTransaction extends TransactionBase{
 	 * amount of any contributions for a private equity fund at the time of the trade.
 	 */
 	private String contributedCapital = null;
-	
-	
-	
+
+
+
 	//Some more new fields added on 29 May 2017
-	
+
 	/**
 	 * Security type code, such as cs, cb, etc. For details, see “Standard Advent Security Types”
 	 */
-	private String securityType = "tbd";
-	
+	private String securityType = null;
+
 	/**
 	 * Security identifier. As a rule, this field contains one of the following values:<br/><ul>
 	 *  <li>Ticker for options and for other security types when available. </li>
 	 *  <li> CUSIP for USD securities. </li>
 	 *  <li> SEDOL for non‐USD securities </li></ul>
 	 */
-	private String securityId = null;
-	
+	private String securityId = "tbd";
+
 	/**
 	 * ISO currency code for the source or destination security type
 	 */
 	private String destinationCurrency = null;
-	
+
 	/**
 	 * Ticker used to identify the security.
 	 */
 	private String assetTicker = null;
-	
+
 	/**
 	 *  CUSIP used to identify the security.
 	 */
 	private String assetCUSIP = null;
-	
+
 	/**
 	 * SEDOL used to identify the security.
 	 */
 	private String assetSEDOL = null;
-	
+
 	/**
 	 * QUIK used to identify the security.
 	 */
 	private String assetQUIK = null;
-	
+
 	/**
 	 * FX relationship denominator currency (ISO code)
 	 */
 	private String fxDenominatorCurrency = null;
-	
+
 	/**
 	 *  FX relationship numerator currency (ISO code).
 	 */
 	private String fxNumeratorCurrency = null;
-	
+
 	/**
 	 * Underlying Bloomberg Ticker. 
 	 */
 	private String underBloombergTicker = null;
-	
+
 	/**
 	 * Underlying Cusip. 
 	 */
 	private String underCUSIP = null;
-	
+
 	/**
 	 * Underlying ISIN. 
 	 */
 	private String underISIN = null;
-	
+
 	/**
 	 *  Underlying RIC.
 	 */
 	private String underRIC = null;
-	
+
 	/**
 	 * Underlying SEDOL.
 	 */
 	private String underSEDOL = null;
-	
+
 	/**
 	 * Underlying Ticker.
 	 */
 	private String underTicker = null;
-	
+
 	/**
 	 * Price Factor to determine the amount. Amount is Quantity x Price x Price Factor. Typically 1 for equity and 100 for options
 	 */
 	private String priceFactor = null;
-	
+
 	/**
 	 * Price in the base currency. 
 	 */
 	private String basePrice = null;
-	
+
 	/**
 	 * The ISO currency code of the account.
 	 */
 	private String accountCurrency = null;
-	
+
 	/**
 	 * The settlement ISO currency code
 	 */
 	private String settlementCurrency = null;
-	
+
 	/**
 	 * Identifies a corporate action. Valid value is “Y” to indicate a corporate action.
 	 */
 	private String corpActionsIndicator = null;
 
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * @return the accountNumber
 	 */
@@ -478,7 +482,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setAssetYield(String assetYield, boolean format) {
 		if(StringUtils.isNotEmpty(assetYield)){
-			this.assetYield = ParserUtility.formatAmount(assetYield);
+			this.assetYield = AccountUtil.formatAmount(assetYield);
 		}
 	}
 	/**
@@ -497,7 +501,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setAssetQuantity(String assetQuantity, boolean format) {
 		if(StringUtils.isNotEmpty(assetQuantity)){
-			this.assetQuantity = ParserUtility.formatAmount(assetQuantity);
+			this.assetQuantity = AccountUtil.formatAmount(assetQuantity);
 		}
 	}
 	/**
@@ -516,7 +520,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setAssetUnitCost(String assetUnitCost, boolean format) {
 		if(StringUtils.isNotEmpty(assetUnitCost)){
-			this.assetUnitCost = ParserUtility.formatAmount(assetUnitCost);
+			this.assetUnitCost = AccountUtil.formatAmount(assetUnitCost);
 		}
 	}
 	/**
@@ -535,7 +539,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setAssetCost(String assetCost, boolean format) {
 		if(StringUtils.isNotEmpty(assetCost)){
-			this.assetCost = ParserUtility.formatAmount(assetCost);
+			this.assetCost = AccountUtil.formatAmount(assetCost);
 		}
 	}
 	/**
@@ -554,7 +558,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setAssetTradeDate(String assetTradeDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(assetTradeDate)){
-			this.assetTradeDate = ParserUtility.convertToPimoneyDate(assetTradeDate, dateFormat);
+			this.assetTradeDate = AccountUtil.convertToDefaultDateFormat(assetTradeDate, dateFormat);
 		}
 	}
 	/**
@@ -615,7 +619,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setValuationDate(String valuationDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(valuationDate)){
-			this.valuationDate = ParserUtility.convertToPimoneyDate(valuationDate, dateFormat);
+			this.valuationDate = AccountUtil.convertToDefaultDateFormat(valuationDate, dateFormat);
 		}
 	}
 
@@ -646,10 +650,16 @@ public class InvestmentTransaction extends TransactionBase{
 		if(StringUtils.isNotEmpty(amount)){
 			this.amount = amount.trim();
 		}
+		else {
+			this.amount = null;
+		}
 	}
 	public void setAmount(String amount, boolean format) {
 		if(StringUtils.isNotEmpty(amount)){
-			this.amount = ParserUtility.formatAmount(amount);
+			this.amount = AccountUtil.formatAmount(amount);
+		}
+		else {
+			this.amount = null;
 		}
 	}
 	/**
@@ -668,10 +678,10 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setTransactionDate(String transactionDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(transactionDate)){
-			this.transactionDate = ParserUtility.convertToPimoneyDate(transactionDate, dateFormat);
+			this.transactionDate = AccountUtil.convertToDefaultDateFormat(transactionDate, dateFormat);
 		}
 	}
-	
+
 	public String getPostDate() {
 		return postDate;
 	}
@@ -685,7 +695,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 	public void setPostDate(String postDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(postDate)){
-			this.postDate = ParserUtility.convertToPimoneyDate(postDate, dateFormat);
+			this.postDate = AccountUtil.convertToDefaultDateFormat(postDate, dateFormat);
 		}
 	}
 	/**
@@ -695,7 +705,7 @@ public class InvestmentTransaction extends TransactionBase{
 		return description;
 	}
 	/**
-	 * @param escription the escription to set
+	 * @param escription the description to set
 	 */
 	public void setDescription(String description) {
 		if(StringUtils.isNotEmpty(description)){
@@ -714,12 +724,12 @@ public class InvestmentTransaction extends TransactionBase{
 	 */
 	public void setStartDate(String startDate) {
 		if(StringUtils.isNotEmpty(startDate)){
-			this.startDate = startDate;
+			this.startDate = startDate.trim();
 		}
 	}
 	public void setStartDate(String startDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(startDate)){
-			this.startDate = ParserUtility.convertToPimoneyDate(startDate, dateFormat);
+			this.startDate = AccountUtil.convertToDefaultDateFormat(startDate, dateFormat);
 		}
 	}
 	/**
@@ -733,12 +743,12 @@ public class InvestmentTransaction extends TransactionBase{
 	 */
 	public void setMaturityDate(String maturityDate) {
 		if(StringUtils.isNotEmpty(maturityDate)){
-			this.maturityDate = maturityDate;
+			this.maturityDate = maturityDate.trim();
 		}
 	}
 	public void setMaturityDate(String maturityDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(maturityDate)){
-			this.maturityDate = ParserUtility.convertToPimoneyDate(maturityDate, dateFormat);
+			this.maturityDate = AccountUtil.convertToDefaultDateFormat(maturityDate, dateFormat);
 		}
 	}
 	/**
@@ -752,12 +762,12 @@ public class InvestmentTransaction extends TransactionBase{
 	 */
 	public void setCoupon(String coupon) {
 		if(StringUtils.isNotEmpty(coupon)){
-			this.coupon = coupon;
+			this.coupon = coupon.trim();
 		}
 	}
 	public void setCoupon(String coupon, boolean format) {
 		if(StringUtils.isNotEmpty(coupon)){
-			this.coupon = ParserUtility.formatAmount(coupon);
+			this.coupon = AccountUtil.formatAmount(coupon);
 		}
 	}
 	/**
@@ -771,12 +781,18 @@ public class InvestmentTransaction extends TransactionBase{
 	 */
 	public void setAccruedInterest(String accruedInterest) {
 		if(StringUtils.isNotEmpty(accruedInterest)){
-			this.accruedInterest = accruedInterest;
+			this.accruedInterest = accruedInterest.trim();
+		}
+		else {
+			this.accruedInterest = null;
 		}
 	}
 	public void setAccruedInterest(String accruedInterest, boolean format) {
 		if(StringUtils.isNotEmpty(accruedInterest)){
-			this.accruedInterest = ParserUtility.formatAmount(accruedInterest);
+			this.accruedInterest = AccountUtil.formatAmount(accruedInterest);
+		}
+		else {
+			this.accruedInterest = null;
 		}
 	}
 	/**
@@ -790,12 +806,12 @@ public class InvestmentTransaction extends TransactionBase{
 	 */
 	public void setStrikePrice(String strikePrice) {
 		if(StringUtils.isNotEmpty(strikePrice)){
-			this.strikePrice = strikePrice;
+			this.strikePrice = strikePrice.trim();
 		}
 	}
 	public void setStrikePrice(String strikePrice, boolean format) {
 		if(StringUtils.isNotEmpty(strikePrice)){
-			this.strikePrice = ParserUtility.formatAmount(strikePrice);
+			this.strikePrice = AccountUtil.formatAmount(strikePrice);
 		}
 	}
 	/**
@@ -809,12 +825,12 @@ public class InvestmentTransaction extends TransactionBase{
 	 */
 	public void setExpiryDate(String expiryDate) {
 		if(StringUtils.isNotEmpty(expiryDate)){
-			this.expiryDate = expiryDate;
+			this.expiryDate = expiryDate.trim();
 		}
 	}
 	public void setExpiryDate(String expiryDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(expiryDate)){
-			this.expiryDate = ParserUtility.convertToPimoneyDate(expiryDate, dateFormat);
+			this.expiryDate = AccountUtil.convertToDefaultDateFormat(expiryDate, dateFormat);
 		}
 	}
 	/**
@@ -828,12 +844,12 @@ public class InvestmentTransaction extends TransactionBase{
 	 */
 	public void setBrokerageAndLevies(String brokerageAndLevies) {
 		if(StringUtils.isNotEmpty(brokerageAndLevies)){
-			this.brokerageAndLevies = brokerageAndLevies;
+			this.brokerageAndLevies = brokerageAndLevies.trim();
 		}
 	}
 	public void setBrokerageAndLevies(String brokerageAndLevies, boolean format) {
 		if(StringUtils.isNotEmpty(brokerageAndLevies)){
-			this.brokerageAndLevies = ParserUtility.formatAmount(brokerageAndLevies);
+			this.brokerageAndLevies = AccountUtil.formatAmount(brokerageAndLevies);
 		}
 	}
 	/**
@@ -850,7 +866,7 @@ public class InvestmentTransaction extends TransactionBase{
 	}
 
 	public void setHash(){
-		String hash = ParserUtility.generateHash(this, properties);
+		String hash = AccountUtil.generateHash(this, getProperties());
 		setFingerprint(hash);
 	}
 
@@ -873,7 +889,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param transCode the transCode to set
 	 */
 	public void setTransCode(String transCode) {
-		this.transCode = transCode;
+		if(StringUtils.isNotEmpty(transCode)) {
+			this.transCode = transCode.trim();
+		}
 	}
 	/**
 	 * @return the assetCostDate
@@ -886,7 +904,15 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetCostDate the assetCostDate to set
 	 */
 	public void setAssetCostDate(String assetCostDate) {
-		this.assetCostDate = assetCostDate;
+		if(StringUtils.isNotEmpty(assetCostDate)) {
+		this.assetCostDate = assetCostDate.trim();
+		}
+	}
+	
+	public void setAssetCostDate(String assetCostDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(assetCostDate)) {
+		this.assetCostDate = AccountUtil.convertToDefaultDateFormat(assetCostDate, dateFormat);
+		}
 	}
 	/**
 	 * @return the closingMethodCode
@@ -901,7 +927,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param closingMethodCode the closingMethodCode to set
 	 */
 	public void setClosingMethodCode(String closingMethodCode) {
-		this.closingMethodCode = closingMethodCode;
+		if(StringUtils.isNotEmpty(closingMethodCode)) {
+		this.closingMethodCode = closingMethodCode.trim();
+		}
 	}
 	/**
 	 * @return the versusDate
@@ -915,7 +943,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param versusDate the versusDate to set
 	 */
 	public void setVersusDate(String versusDate) {
-		this.versusDate = versusDate;
+		if(StringUtils.isNotEmpty(versusDate)) {
+		this.versusDate = versusDate.trim();
+		}
+	}
+	public void setVersusDate(String versusDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(versusDate)) {
+		this.versusDate = AccountUtil.convertToDefaultDateFormat(versusDate, dateFormat);
+		}
 	}
 	/**
 	 * @return the srcDstType
@@ -928,7 +963,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param srcDstType the srcDstType to set
 	 */
 	public void setSrcDstType(String srcDstType) {
-		this.srcDstType = srcDstType;
+		if(StringUtils.isNotEmpty(srcDstType)) {
+		this.srcDstType = srcDstType.trim();
+		}
 	}
 	/**
 	 * @return the srcDstSymbol
@@ -941,7 +978,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param srcDstSymbol the srcDstSymbol to set
 	 */
 	public void setSrcDstSymbol(String srcDstSymbol) {
-		this.srcDstSymbol = srcDstSymbol;
+		if(StringUtils.isNotEmpty(srcDstSymbol)) {
+		this.srcDstSymbol = srcDstSymbol.trim();
+		}
 	}
 	/**
 	 * @return the tradeDateFxRate
@@ -954,7 +993,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param tradeDateFxRate the tradeDateFxRate to set
 	 */
 	public void setTradeDateFxRate(String tradeDateFxRate) {
-		this.tradeDateFxRate = tradeDateFxRate;
+		if(StringUtils.isNotEmpty(tradeDateFxRate)) {
+		this.tradeDateFxRate = tradeDateFxRate.trim();
+		}
+	}
+	public void setTradeDateFxRate(String tradeDateFxRate, boolean format) {
+		if(StringUtils.isNotEmpty(tradeDateFxRate)) {
+		this.tradeDateFxRate = AccountUtil.formatAmount(tradeDateFxRate);
+		}
 	}
 	/**
 	 * @return the valuationDateFxRate
@@ -967,7 +1013,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param valuationDateFxRate the valuationDateFxRate to set
 	 */
 	public void setValuationDateFxRate(String valuationDateFxRate) {
-		this.valuationDateFxRate = valuationDateFxRate;
+		if(StringUtils.isNotEmpty(valuationDateFxRate)) {
+		this.valuationDateFxRate = valuationDateFxRate.trim();
+		}
+	}
+	public void setValuationDateFxRate(String valuationDateFxRate, boolean format) {
+		if(StringUtils.isNotEmpty(valuationDateFxRate)) {
+		this.valuationDateFxRate = AccountUtil.formatAmount(valuationDateFxRate);
+		}
 	}
 	/**
 	 * @return the assetOriginalFxRate
@@ -980,7 +1033,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetOriginalFxRate the assetOriginalFxRate to set
 	 */
 	public void setAssetOriginalFxRate(String assetOriginalFxRate) {
-		this.assetOriginalFxRate = assetOriginalFxRate;
+		if(StringUtils.isNotEmpty(assetOriginalFxRate)) {
+		this.assetOriginalFxRate = assetOriginalFxRate.trim();
+		}
+	}
+	public void setAssetOriginalFxRate(String assetOriginalFxRate, boolean format) {
+		if(StringUtils.isNotEmpty(assetOriginalFxRate)) {
+		this.assetOriginalFxRate = AccountUtil.formatAmount(assetOriginalFxRate);
+		}
 	}
 	/**
 	 * @return the markToMarket
@@ -995,7 +1055,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param markToMarket the markToMarket to set
 	 */
 	public void setMarkToMarket(String markToMarket) {
-		this.markToMarket = markToMarket;
+		if(StringUtils.isNotEmpty(markToMarket)) {
+		this.markToMarket = markToMarket.trim();
+		}
 	}
 	/**
 	 * @return the assetMTM
@@ -1008,7 +1070,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetMTM the assetMTM to set
 	 */
 	public void setAssetMTM(String assetMTM) {
-		this.assetMTM = assetMTM;
+		if(StringUtils.isNotEmpty(assetMTM)) {
+		this.assetMTM = assetMTM.trim();
+		}
+	}
+	public void setAssetMTM(String assetMTM, boolean format) {
+		if(StringUtils.isNotEmpty(assetMTM)) {
+		this.assetMTM = AccountUtil.formatAmount(assetMTM);
+		}
 	}
 	/**
 	 * @return the assetWithholdingTax
@@ -1021,7 +1090,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetWithholdingTax the assetWithholdingTax to set
 	 */
 	public void setAssetWithholdingTax(String assetWithholdingText) {
-		this.assetWithholdingTax = assetWithholdingText;
+		if(StringUtils.isNotEmpty(assetWithholdingText)) {
+		this.assetWithholdingTax = assetWithholdingText.trim();
+		}
+	}
+	public void setAssetWithholdingTax(String assetWithholdingText, boolean format) {
+		if(StringUtils.isNotEmpty(assetWithholdingText)) {
+		this.assetWithholdingTax = AccountUtil.formatAmount(assetWithholdingText);
+		}
 	}
 	/**
 	 * @return the exchange
@@ -1034,7 +1110,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param exchange the exchange to set
 	 */
 	public void setExchange(String exchange) {
-		this.exchange = exchange;
+		if(StringUtils.isNotEmpty(exchange)) {
+		this.exchange = exchange.trim();
+		}
 	}
 	/**
 	 * @return the exchangeFee
@@ -1047,7 +1125,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param exchangeFee the exchangeFee to set
 	 */
 	public void setExchangeFee(String exchangeFee) {
-		this.exchangeFee = exchangeFee;
+		if(StringUtils.isNotEmpty(exchangeFee)) {
+		this.exchangeFee = exchangeFee.trim();
+		}
+	}
+	public void setExchangeFee(String exchangeFee, boolean format) {
+		if(StringUtils.isNotEmpty(exchangeFee)) {
+		this.exchangeFee = AccountUtil.formatAmount(exchangeFee);
+		}
 	}
 	/**
 	 * @return the commission
@@ -1060,7 +1145,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param commission the commission to set
 	 */
 	public void setCommission(String commision) {
-		this.commission = commision;
+		if(StringUtils.isNotEmpty(commision)) {
+		this.commission = commision.trim();
+		}
+	}
+	public void setCommission(String commision, boolean format) {
+		if(StringUtils.isNotEmpty(commision)) {
+		this.commission = AccountUtil.formatAmount(commision);
+		}
 	}
 	/**
 	 * @return the otherFees
@@ -1073,7 +1165,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param otherFees the otherFees to set
 	 */
 	public void setOtherFees(String otherFees) {
-		this.otherFees = otherFees;
+		if(StringUtils.isNotEmpty(otherFees)) {
+		this.otherFees = otherFees.trim();
+		}
+	}
+	public void setOtherFees(String otherFees, boolean format) {
+		if(StringUtils.isNotEmpty(otherFees)) {
+		this.otherFees = AccountUtil.formatAmount(otherFees);
+		}
 	}
 	/**
 	 * @return the impliedCommission
@@ -1088,7 +1187,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param impliedCommission the impliedCommission to set
 	 */
 	public void setImpliedCommission(String impliedCommission) {
-		this.impliedCommission = impliedCommission;
+		if(StringUtils.isNotEmpty(impliedCommission)) {
+		this.impliedCommission = impliedCommission.trim();
+		}
+	}
+	public void setImpliedCommission(String impliedCommission, boolean format) {
+		if(StringUtils.isNotEmpty(impliedCommission)) {
+		this.impliedCommission = AccountUtil.formatAmount(impliedCommission);
+		}
 	}
 	/**
 	 * @return the commissionPurpose
@@ -1101,7 +1207,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param commissionPurpose the commissionPurpose to set
 	 */
 	public void setCommissionPurpose(String commissionPurpose) {
-		this.commissionPurpose = commissionPurpose;
+		if(StringUtils.isNotEmpty(commissionPurpose)) {
+		this.commissionPurpose = commissionPurpose.trim();
+		}
 	}
 	/**
 	 * @return the assetPledge
@@ -1115,7 +1223,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetPledge the assetPledge to set
 	 */
 	public void setAssetPledge(String assetPledge) {
-		this.assetPledge = assetPledge;
+		if(StringUtils.isNotEmpty(assetPledge)) {
+		this.assetPledge = assetPledge.trim();
+		}
 	}
 	/**
 	 * @return the destinationPledge
@@ -1128,7 +1238,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param destinationPledge the destinationPledge to set
 	 */
 	public void setDestinationPledge(String destinationPledge) {
-		this.destinationPledge = destinationPledge;
+		if(StringUtils.isNotEmpty(destinationPledge)) {
+		this.destinationPledge = destinationPledge.trim();
+		}
 	}
 	/**
 	 * @return the destinationCustodian
@@ -1141,7 +1253,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param destinationCustodian the destinationCustodian to set
 	 */
 	public void setDestinationCustodian(String destinationCustodian) {
-		this.destinationCustodian = destinationCustodian;
+		if(StringUtils.isNotEmpty(destinationCustodian)) {
+		this.destinationCustodian = destinationCustodian.trim();
+		}
 	}
 	/**
 	 * @return the assetDuration
@@ -1154,7 +1268,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetDuration the assetDuration to set
 	 */
 	public void setAssetDuration(String assetDuration) {
-		this.assetDuration = assetDuration;
+		if(StringUtils.isNotEmpty(assetDuration)) {
+		this.assetDuration = assetDuration.trim();
+		}
 	}
 	/**
 	 * @return the recordDate
@@ -1167,7 +1283,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param recordDate the recordDate to set
 	 */
 	public void setRecordDate(String recordDate) {
-		this.recordDate = recordDate;
+		if(StringUtils.isNotEmpty(recordDate)) {
+		this.recordDate = recordDate.trim();
+		}
+	}
+	public void setRecordDate(String recordDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(recordDate)) {
+		this.recordDate = AccountUtil.convertToDefaultDateFormat(recordDate, dateFormat);
+		}
 	}
 	/**
 	 * @return the strategy
@@ -1181,7 +1304,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param strategy the strategy to set
 	 */
 	public void setStrategy(String strategy) {
-		this.strategy = strategy;
+		if(StringUtils.isNotEmpty(strategy)) {
+		this.strategy = strategy.trim();
+		}
 	}
 	/**
 	 * @return the reclaimAmount
@@ -1194,7 +1319,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param reclaimAmount the reclaimAmount to set
 	 */
 	public void setReclaimAmount(String reclaimAmount) {
-		this.reclaimAmount = reclaimAmount;
+		if(StringUtils.isNotEmpty(reclaimAmount)) {
+		this.reclaimAmount = reclaimAmount.trim();
+		}
+	}
+	public void setReclaimAmount(String reclaimAmount, boolean format) {
+		if(StringUtils.isNotEmpty(reclaimAmount)) {
+		this.reclaimAmount = AccountUtil.formatAmount(reclaimAmount);
+		}
 	}
 	/**
 	 * @return the accrualAccount
@@ -1207,7 +1339,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param accrualAccount the accrualAccount to set
 	 */
 	public void setAccrualAccount(String accrualAccount) {
-		this.accrualAccount = accrualAccount;
+		if(StringUtils.isNotEmpty(accrualAccount)) {
+		this.accrualAccount = accrualAccount.trim();
+		}
 	}
 	/**
 	 * @return the dividendAccrualMethod
@@ -1221,7 +1355,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param dividendAccrualMethod the dividendAccrualMethod to set
 	 */
 	public void setDividendAccrualMethod(String dividendAccrualMethod) {
-		this.dividendAccrualMethod = dividendAccrualMethod;
+		if(StringUtils.isNotEmpty(dividendAccrualMethod)) {
+		this.dividendAccrualMethod = dividendAccrualMethod.trim();
+		}
 	}
 	/**
 	 * @return the mgmtFeePeriodDate
@@ -1242,7 +1378,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param mgmtFeePeriodDate the mgmtFeePeriodDate to set
 	 */
 	public void setMgmtFeePeriodDate(String mgmtFeePeriodDate) {
-		this.mgmtFeePeriodDate = mgmtFeePeriodDate;
+		if(StringUtils.isNotEmpty(mgmtFeePeriodDate)) {
+		this.mgmtFeePeriodDate = mgmtFeePeriodDate.trim();
+		}
+	}
+	public void setMgmtFeePeriodDate(String mgmtFeePeriodDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(mgmtFeePeriodDate)) {
+		this.mgmtFeePeriodDate = AccountUtil.convertToDefaultDateFormat(mgmtFeePeriodDate, dateFormat);
+		}
 	}
 	/**
 	 * @return the shortPositions
@@ -1256,7 +1399,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param shortPositions the shortPositions to set
 	 */
 	public void setShortPositions(String shortPositions) {
-		this.shortPositions = shortPositions;
+		if(StringUtils.isNotEmpty(shortPositions)) {
+		this.shortPositions = shortPositions.trim();
+		}
 	}
 	/**
 	 * @return the dividendStatus
@@ -1270,7 +1415,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param dividendStatus the dividendStatus to set
 	 */
 	public void setDividendStatus(String dividendStatus) {
-		this.dividendStatus = dividendStatus;
+		if(StringUtils.isNotEmpty(dividendStatus)) {
+		this.dividendStatus = dividendStatus.trim();
+		}
 	}
 	/**
 	 * @return the recallable
@@ -1286,7 +1433,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param recallable the recallable to set
 	 */
 	public void setRecallable(String recallable) {
-		this.recallable = recallable;
+		if(StringUtils.isNotEmpty(recallable)) {
+		this.recallable = recallable.trim();
+		}
 	}
 	/**
 	 * @return the brokerFirmSymbol
@@ -1299,7 +1448,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param brokerFirmSymbol the brokerFirmSymbol to set
 	 */
 	public void setBrokerFirmSymbol(String brokerFirmSymbol) {
-		this.brokerFirmSymbol = brokerFirmSymbol;
+		if(StringUtils.isNotEmpty(brokerFirmSymbol)) {
+		this.brokerFirmSymbol = brokerFirmSymbol.trim();
+		}
 	}
 	/**
 	 * @return the committedCapital
@@ -1316,7 +1467,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param committedCapital the committedCapital to set
 	 */
 	public void setCommittedCapital(String commitedCapital) {
-		this.committedCapital = commitedCapital;
+		if(StringUtils.isNotEmpty(commitedCapital)) {
+		this.committedCapital = commitedCapital.trim();
+		}
+	}
+	public void setCommittedCapital(String commitedCapital, boolean format) {
+		if(StringUtils.isNotEmpty(commitedCapital)) {
+		this.committedCapital = AccountUtil.formatAmount(commitedCapital);
+		}
 	}
 	/**
 	 * @return the contributedCapital
@@ -1328,13 +1486,20 @@ public class InvestmentTransaction extends TransactionBase{
 	 * amount of any contributions for a private equity fund at the time of the trade.
 	 */
 	public void setContributedCapital(String contributedCapital) {
-		this.contributedCapital = contributedCapital;
+		if(StringUtils.isNotEmpty(contributedCapital)) {
+		this.contributedCapital = contributedCapital.trim();
+		}
 	}
-	
-	
+	public void setContributedCapital(String contributedCapital, boolean format) {
+		if(StringUtils.isNotEmpty(contributedCapital)) {
+		this.contributedCapital = AccountUtil.formatAmount(contributedCapital);
+		}
+	}
+
+
 	//some more new fields added on 29 May 2017
-	
-	 
+
+
 
 	/**
 	 * @return the securityType
@@ -1347,7 +1512,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param securityType the securityType to set
 	 */
 	public void setSecurityType(String securityType) {
-		this.securityType = securityType;
+		if(StringUtils.isNotEmpty(securityType)) {
+		this.securityType = securityType.trim();
+		}
 	}
 	/**
 	 * @return the securityId
@@ -1363,7 +1530,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param securityId the securityId to set
 	 */
 	public void setSecurityId(String securityId) {
-		this.securityId = securityId;
+		if(StringUtils.isNotEmpty(securityId)) {
+		this.securityId = securityId.trim();
+		}
 	}
 	/**
 	 * @return the destinationCurrency
@@ -1376,7 +1545,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param destinationCurrency the destinationCurrency to set
 	 */
 	public void setDestinationCurrency(String destinationCurrency) {
-		this.destinationCurrency = destinationCurrency;
+		if(StringUtils.isNotEmpty(destinationCurrency)) {
+		this.destinationCurrency = destinationCurrency.trim();
+		}
 	}
 	/**
 	 * @return the assetTicker
@@ -1389,7 +1560,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetTicker the assetTicker to set
 	 */
 	public void setAssetTicker(String assetTicker) {
-		this.assetTicker = assetTicker;
+		if(StringUtils.isNotEmpty(assetTicker)) {
+		this.assetTicker = assetTicker.trim();
+		}
 	}
 	/**
 	 * @return the assetCUSIP
@@ -1402,7 +1575,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetCUSIP the assetCUSIP to set
 	 */
 	public void setAssetCUSIP(String assetCUSIP) {
-		this.assetCUSIP = assetCUSIP;
+		if(StringUtils.isNotEmpty(assetCUSIP)) {
+		this.assetCUSIP = assetCUSIP.trim();
+		}
 	}
 	/**
 	 * @return the assetSEDOL
@@ -1415,7 +1590,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetSEDOL the assetSEDOL to set
 	 */
 	public void setAssetSEDOL(String assetSEDOL) {
-		this.assetSEDOL = assetSEDOL;
+		if(StringUtils.isNotEmpty(assetSEDOL)) {
+		this.assetSEDOL = assetSEDOL.trim();
+		}
 	}
 	/**
 	 * @return the assetQUIK
@@ -1428,7 +1605,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param assetQUIK the assetQUIK to set
 	 */
 	public void setAssetQUIK(String assetQUIK) {
-		this.assetQUIK = assetQUIK;
+		if(StringUtils.isNotEmpty(assetQUIK)) {
+		this.assetQUIK = assetQUIK.trim();
+		}
 	}
 	/**
 	 * @return the fxDenominatorCurrency
@@ -1441,7 +1620,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param fxDenominatorCurrency the fxDenominatorCurrency to set
 	 */
 	public void setFxDenominatorCurrency(String fxDenominatorCurrency) {
-		this.fxDenominatorCurrency = fxDenominatorCurrency;
+		if(StringUtils.isNotEmpty(fxDenominatorCurrency)) {
+		this.fxDenominatorCurrency = fxDenominatorCurrency.trim();
+		}
 	}
 	/**
 	 * @return the fxNumeratorCurrency
@@ -1454,7 +1635,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param fxNumeratorCurrency the fxNumeratorCurrency to set
 	 */
 	public void setFxNumeratorCurrency(String fxNumeratorCurrency) {
-		this.fxNumeratorCurrency = fxNumeratorCurrency;
+		if(StringUtils.isNotEmpty(fxNumeratorCurrency)) {
+		this.fxNumeratorCurrency = fxNumeratorCurrency.trim();
+		}
 	}
 	/**
 	 * @return the underBloombergTicker
@@ -1467,7 +1650,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param underBloombergTicker the underBloombergTicker to set
 	 */
 	public void setUnderBloombergTicker(String underBloombergTicker) {
-		this.underBloombergTicker = underBloombergTicker;
+		if(StringUtils.isNotEmpty(underBloombergTicker)) {
+		this.underBloombergTicker = underBloombergTicker.trim();
+		}
 	}
 	/**
 	 * @return the underCUSIP
@@ -1480,7 +1665,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param underCUSIP the underCUSIP to set
 	 */
 	public void setUnderCUSIP(String underCUSIP) {
-		this.underCUSIP = underCUSIP;
+		if(StringUtils.isNotEmpty(underCUSIP)) {
+		this.underCUSIP = underCUSIP.trim();
+		}
 	}
 	/**
 	 * @return the underISIN
@@ -1493,7 +1680,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param underISIN the underISIN to set
 	 */
 	public void setUnderISIN(String underISIN) {
-		this.underISIN = underISIN;
+		if(StringUtils.isNotEmpty(underISIN)) {
+		this.underISIN = underISIN.trim();
+		}
 	}
 	/**
 	 * @return the underRIC
@@ -1506,7 +1695,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param underRIC the underRIC to set
 	 */
 	public void setUnderRIC(String underRIC) {
-		this.underRIC = underRIC;
+		if(StringUtils.isNotEmpty(underRIC)) {
+		this.underRIC = underRIC.trim();
+		}
 	}
 	/**
 	 * @return the underSEDOL
@@ -1519,7 +1710,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param underSEDOL the underSEDOL to set
 	 */
 	public void setUnderSEDOL(String underSEDOL) {
-		this.underSEDOL = underSEDOL;
+		if(StringUtils.isNotEmpty(underSEDOL)) {
+		this.underSEDOL = underSEDOL.trim();
+		}
 	}
 	/**
 	 * @return the underTicker
@@ -1532,7 +1725,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param underTicker the underTicker to set
 	 */
 	public void setUnderTicker(String underTicker) {
-		this.underTicker = underTicker;
+		if(StringUtils.isNotEmpty(underTicker)) {
+		this.underTicker = underTicker.trim();
+		}
 	}
 	/**
 	 * @return the priceFactor
@@ -1545,7 +1740,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param priceFactor the priceFactor to set
 	 */
 	public void setPriceFactor(String priceFactor) {
-		this.priceFactor = priceFactor;
+		if(StringUtils.isNotEmpty(priceFactor)) {
+		this.priceFactor = priceFactor.trim();
+		}
+	}
+	public void setPriceFactor(String priceFactor, boolean format) {
+		if(StringUtils.isNotEmpty(priceFactor)) {
+		this.priceFactor = AccountUtil.formatAmount(priceFactor);
+		}
 	}
 	/**
 	 * @return the basePrice
@@ -1558,7 +1760,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param basePrice the basePrice to set
 	 */
 	public void setBasePrice(String basePrice) {
-		this.basePrice = basePrice;
+		if(StringUtils.isNotEmpty(basePrice)) {
+		this.basePrice = basePrice.trim();
+		}
+	}
+	public void setBasePrice(String basePrice, boolean format) {
+		if(StringUtils.isNotEmpty(basePrice)) {
+		this.basePrice = AccountUtil.formatAmount(basePrice);
+		}
 	}
 	/**
 	 * @return the accountCurrency
@@ -1571,7 +1780,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param accountCurrency the accountCurrency to set
 	 */
 	public void setAccountCurrency(String accountCurrency) {
-		this.accountCurrency = accountCurrency;
+		if(StringUtils.isNotEmpty(accountCurrency)) {
+		this.accountCurrency = accountCurrency.trim();
+		}
 	}
 	/**
 	 * @return the settlementCurrency
@@ -1584,7 +1795,9 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param settlementCurrency the settlementCurrency to set
 	 */
 	public void setSettlementCurrency(String settlementCurrency) {
-		this.settlementCurrency = settlementCurrency;
+		if(StringUtils.isNotEmpty(settlementCurrency)) {
+		this.settlementCurrency = settlementCurrency.trim();
+		}
 	}
 	/**
 	 * @return the corpActionsIndicator
@@ -1597,8 +1810,14 @@ public class InvestmentTransaction extends TransactionBase{
 	 * @param corpActionsIndicator the corpActionsIndicator to set
 	 */
 	public void setCorpActionsIndicator(String corpActionsIndicator) {
-		this.corpActionsIndicator = corpActionsIndicator;
+		if(StringUtils.isNotEmpty(corpActionsIndicator)) {
+		this.corpActionsIndicator = corpActionsIndicator.trim();
+		}
+	}
+	@Override
+	public String getTag() {
+		return tag;
 	}
 
-	
+
 }

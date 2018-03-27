@@ -1,37 +1,71 @@
 package com.pisight.pimoney.models;
 
+import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 
-import com.pisight.pimoney.beans.ParserUtility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.pisight.pimoney.util.AccountUtil;
 
 /**
+ * This class represent HoldingAsset model.<br/>
+ * For setting asset category use constants defined in this class.
+ * 
  * @author kumar
  *
  */
-public class HoldingAsset {
-
-	private static Logger logger = Logger.getLogger(HoldingAsset.class);
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class HoldingAsset implements Cloneable, Serializable{
 
 	// Constants for Asset Categories
-
+	private static final long serialVersionUID = -6635605510628285889L;
+	public static final String CATEGORY_ETF = "ETF";
 	public static final String CATEGORY_LOAN = "Loan";
 	public static final String CATEGORY_CASH = "Cash";
 	public static final String CATEGORY_BOND = "Bond";
 	public static final String CATEGORY_EQUITY = "Equity";
-	public static final String CATEGORY_DEPOSIT = "Deposit";
+	public static final String CATEGORY_INSURANCE = "Insurance";
+	public static final String CATEGORY_DEPOSIT = "Time Deposit";
 	public static final String CATEGORY_COMMODITY = "Commodity";
+	public static final String CATEGORY_REAL_ESTATE = "Real Estate";
+	public static final String CATEGORY_COLLECTIBLES = "Collectibles";
+	public static final String CATEGORY_MISCELLANEOUS = "Miscellaneous";
 	public static final String CATEGORY_ALTERNATE_ASSET = "Alternate Asset";
+	public static final String CATEGORY_FOREIGN_EXCHANGE = "Foreign Exchange";
 	public static final String CATEGORY_UNIT_TRUST__MUTUAL_FUND = "Unit Trust / Mutual Fund";
 	public static final String CATEGORY_ALTERNATE_TRADING_STRATEGY = "Alternate Trading Strategy";
 	public static final String CATEGORY_MULTI_ASSET__STRUCTURED_NOTES = "Multi Asset Class / Structured Notes";
 	public static final String CATEGORY_PRIVATE_EQUITY__HEDGE_N_OTHER_FUND = "Private Equity and Other Fund";
 	public static final String CATEGORY_MONEY_MARKET_N_DISCOUNTED_INSTRUMENT = "Money Market and Discounted Instrument";
 
-	private String  holdingAssetAccountNumber;
+	public static final List<String> CATEGORY_LIST = new ArrayList<String>();
+
+	static {
+		CATEGORY_LIST.add(CATEGORY_ETF);
+		CATEGORY_LIST.add(CATEGORY_LOAN);
+		CATEGORY_LIST.add(CATEGORY_CASH);
+		CATEGORY_LIST.add(CATEGORY_BOND);
+		CATEGORY_LIST.add(CATEGORY_EQUITY);
+		CATEGORY_LIST.add(CATEGORY_INSURANCE);
+		CATEGORY_LIST.add(CATEGORY_DEPOSIT);
+		CATEGORY_LIST.add(CATEGORY_COMMODITY);
+		CATEGORY_LIST.add(CATEGORY_REAL_ESTATE);
+		CATEGORY_LIST.add(CATEGORY_COLLECTIBLES);
+		CATEGORY_LIST.add(CATEGORY_MISCELLANEOUS);
+		CATEGORY_LIST.add(CATEGORY_ALTERNATE_ASSET);
+		CATEGORY_LIST.add(CATEGORY_UNIT_TRUST__MUTUAL_FUND);
+		CATEGORY_LIST.add(CATEGORY_ALTERNATE_TRADING_STRATEGY);
+		CATEGORY_LIST.add(CATEGORY_MULTI_ASSET__STRUCTURED_NOTES);
+		CATEGORY_LIST.add(CATEGORY_PRIVATE_EQUITY__HEDGE_N_OTHER_FUND);
+		CATEGORY_LIST.add(CATEGORY_MONEY_MARKET_N_DISCOUNTED_INSTRUMENT);
+	}
+
+
+	private String  holdingAssetAccountNumber = "tbd";
 	private String  holdingAssetSubAccountNumber;
 	/**
 	 * Security identifier. As a rule, this field contains one of the following values:<br/><ul>
@@ -39,7 +73,7 @@ public class HoldingAsset {
 	 *  <li> CUSIP for USD securities. </li>
 	 *  <li> SEDOL for non‐USD securities </li></ul>
 	 */
-	private String  holdingAssetSecurityId;
+	private String  holdingAssetSecurityId = "tbd";
 	private String  holdingAssetName;
 	private String  holdingAssetDescription;
 	private String  holdingAssetCategory;
@@ -49,37 +83,35 @@ public class HoldingAsset {
 	private String  holdingAssetQuantity;
 	private String  holdingAssetAverageUnitCost;
 	private String  holdingAssetIndicativePrice;
-	private String  holdingAssetCost;
+	private String  holdingAssetCost = "tbd";
 	private String  holdingAssetCurrentValue;
 	private String  holdingAssetIndicativePriceDate;
 	private String  holdingAssetProfit;
 	private String  holdingAssetProfitPerc;
 	private String  holdingAssetCustodian;
-	private String  holdingAssetMaturityDate;
+	private String  holdingAssetMaturityDate = "tbd"; // Mail Date = 29th Aug 2017
 	private String  holdingAssetIssuer;
 	private String  holdingAssetAccruedInterest;
 	private String  holdingAssetLastFxRate;
-	private String  holdingAssetFxAccruredInterest;
-	private String  holdingAssetStartDate;
+	private String  holdingAssetFxAccruedInterest;
+	private String  holdingAssetStartDate = "tbd";
 	private String  holdingAssetFxMarketValue;
 	private String  holdingAssetUnrealizedProfitLoss;
 	private String  holdingAssetUnrealizedProfitLossCurrency;
-	private String  holdingAssetISIN;
+	private String  holdingAssetISIN = "tbd";
 	private String  holdingAssetCommencingDate;
-	private String  holdingAssetCoupon;
+	private String  holdingAssetCoupon = "tbd";
 	private String  holdingAssetStrikePrice;
 	private String  holdingAssetInterestTillMaturity;
 	private String  holdingAssetOption;
 	private String  fingerprint;
-
-
 
 	//new fields added on 31st May 2017
 
 	/**
 	 * two letters transaction code to identify the transaction type
 	 */
-	private String transCode = null;
+	private String transCode = "li";
 
 	/**
 	 * open date for the position
@@ -279,7 +311,7 @@ public class HoldingAsset {
 	/**
 	 * Security type code, such as cs, cb, etc. For details, see “Standard Advent Security Types”
 	 */
-	private String securityType = null;
+	private String securityType = "tbd";
 
 	/**
 	 * ISO currency code for the source or destination security type
@@ -440,7 +472,7 @@ public class HoldingAsset {
 	/**
 	 * @param bondNature the bondNature to set
 	 */
-	public void setBondNature(boolean bondNature) {
+	public void setBondNature(Boolean bondNature) {
 		this.bondNature = bondNature;
 	}
 
@@ -572,7 +604,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetYield(String holdingAssetYield, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetYield)){
-			this.holdingAssetYield = ParserUtility.formatAmount(holdingAssetYield.trim());
+			this.holdingAssetYield = AccountUtil.formatAmount(holdingAssetYield.trim());
 		}
 	}
 	/**
@@ -591,7 +623,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetQuantity(String holdingAssetQuantity, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetQuantity)){
-			this.holdingAssetQuantity = ParserUtility.formatAmount(holdingAssetQuantity.trim());
+			this.holdingAssetQuantity = AccountUtil.formatAmount(holdingAssetQuantity.trim());
 		}
 	}
 	/**
@@ -610,7 +642,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetAverageUnitCost(String holdingAssetAverageUnitCost, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetAverageUnitCost)){
-			this.holdingAssetAverageUnitCost = ParserUtility.formatAmount(holdingAssetAverageUnitCost.trim());
+			this.holdingAssetAverageUnitCost = AccountUtil.formatAmount(holdingAssetAverageUnitCost.trim());
 		}
 	}
 	/**
@@ -629,7 +661,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetIndicativePrice(String holdingAssetIndicativePrice, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetIndicativePrice)){
-			this.holdingAssetIndicativePrice = ParserUtility.formatAmount(holdingAssetIndicativePrice.trim());
+			this.holdingAssetIndicativePrice = AccountUtil.formatAmount(holdingAssetIndicativePrice.trim());
 		}
 	}
 	/**
@@ -648,7 +680,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetCost(String holdingAssetCost, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetCost)){
-			this.holdingAssetCost = ParserUtility.formatAmount(holdingAssetCost.trim());
+			this.holdingAssetCost = AccountUtil.formatAmount(holdingAssetCost.trim());
 		}
 	}
 	/**
@@ -667,7 +699,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetCurrentValue(String holdingAssetCurrentValue, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetCurrentValue)){
-			this.holdingAssetCurrentValue = ParserUtility.formatAmount(holdingAssetCurrentValue.trim());
+			this.holdingAssetCurrentValue = AccountUtil.formatAmount(holdingAssetCurrentValue.trim());
 		}
 	}
 	/**
@@ -686,7 +718,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetIndicativePriceDate(String holdingAssetIndicativePriceDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(holdingAssetIndicativePriceDate)){
-			this.holdingAssetIndicativePriceDate = ParserUtility.convertToPimoneyDate(holdingAssetIndicativePriceDate.trim(), dateFormat);
+			this.holdingAssetIndicativePriceDate = AccountUtil.convertToDefaultDateFormat(holdingAssetIndicativePriceDate.trim(), dateFormat);
 		}
 	}
 	/**
@@ -705,7 +737,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetProfit(String holdingAssetProfit, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetProfit)){
-			this.holdingAssetProfit = ParserUtility.formatAmount(holdingAssetProfit.trim());
+			this.holdingAssetProfit = AccountUtil.formatAmount(holdingAssetProfit.trim());
 		}
 	}
 	/**
@@ -724,7 +756,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetProfitPerc(String holdingAssetProfitPerc, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetProfitPerc)){
-			this.holdingAssetProfitPerc = ParserUtility.formatAmount(holdingAssetProfitPerc.trim());
+			this.holdingAssetProfitPerc = AccountUtil.formatAmount(holdingAssetProfitPerc.trim());
 		}
 	}
 	/**
@@ -758,7 +790,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetMaturityDate(String holdingAssetMaturityDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(holdingAssetMaturityDate)){
-			this.holdingAssetMaturityDate = ParserUtility.convertToPimoneyDate(holdingAssetMaturityDate.trim(), dateFormat);
+			this.holdingAssetMaturityDate = AccountUtil.convertToDefaultDateFormat(holdingAssetMaturityDate.trim(), dateFormat);
 		}
 	}
 	/**
@@ -791,7 +823,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetAccruedInterest(String holdingAssetAccruedInterest, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetAccruedInterest)){
-			this.holdingAssetAccruedInterest = ParserUtility.formatAmount(holdingAssetAccruedInterest.trim());
+			this.holdingAssetAccruedInterest = AccountUtil.formatAmount(holdingAssetAccruedInterest.trim());
 		}
 	}
 	/**
@@ -810,26 +842,26 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetLastFxRate(String holdingAssetLastFxRate, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetLastFxRate)){
-			this.holdingAssetLastFxRate = ParserUtility.formatAmount(holdingAssetLastFxRate.trim());
+			this.holdingAssetLastFxRate = AccountUtil.formatAmount(holdingAssetLastFxRate.trim());
 		}
 	}
 	/**
-	 * @return the holdingAssetFxAccruredInterest
+	 * @return the holdingAssetFxAccruedInterest
 	 */
-	public String getHoldingAssetFxAccruredInterest() {
-		return holdingAssetFxAccruredInterest;
+	public String getHoldingAssetFxAccruedInterest() {
+		return holdingAssetFxAccruedInterest;
 	}
 	/**
-	 * @param holdingAssetFxAccruredInterest the holdingAssetFxAccruredInterest to set
+	 * @param holdingAssetFxAccruedInterest the holdingAssetFxAccruedInterest to set
 	 */
-	public void setHoldingAssetFxAccruredInterest(String holdingAssetFxAccruredInterest) {
+	public void setHoldingAssetFxAccruedInterest(String holdingAssetFxAccruredInterest) {
 		if(StringUtils.isNotEmpty(holdingAssetFxAccruredInterest)){
-			this.holdingAssetFxAccruredInterest = holdingAssetFxAccruredInterest.trim();
+			this.holdingAssetFxAccruedInterest = holdingAssetFxAccruredInterest.trim();
 		}
 	}
 	public void setHoldingAssetFxAccruredInterest(String holdingAssetFxAccruredInterest, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetFxAccruredInterest)){
-			this.holdingAssetFxAccruredInterest = ParserUtility.formatAmount(holdingAssetFxAccruredInterest.trim());
+			this.holdingAssetFxAccruedInterest = AccountUtil.formatAmount(holdingAssetFxAccruredInterest.trim());
 		}
 	}
 	/**
@@ -848,7 +880,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetStartDate(String holdingAssetStartDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(holdingAssetStartDate)){
-			this.holdingAssetStartDate = ParserUtility.convertToPimoneyDate(holdingAssetStartDate.trim(), dateFormat);
+			this.holdingAssetStartDate = AccountUtil.convertToDefaultDateFormat(holdingAssetStartDate.trim(), dateFormat);
 		}
 	}
 	/**
@@ -867,7 +899,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetFxMarketValue(String holdingAssetFxMarketValue, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetFxMarketValue)){
-			this.holdingAssetFxMarketValue = ParserUtility.formatAmount(holdingAssetFxMarketValue.trim());
+			this.holdingAssetFxMarketValue = AccountUtil.formatAmount(holdingAssetFxMarketValue.trim());
 		}
 	}
 	/**
@@ -886,7 +918,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetUnrealizedProfitLoss(String holdingAssetUnrealizedProfitLoss, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetUnrealizedProfitLoss)){
-			this.holdingAssetUnrealizedProfitLoss = ParserUtility.formatAmount(holdingAssetUnrealizedProfitLoss.trim());
+			this.holdingAssetUnrealizedProfitLoss = AccountUtil.formatAmount(holdingAssetUnrealizedProfitLoss.trim());
 		}
 	}
 	/**
@@ -933,7 +965,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetCommencingDate(String holdingAssetCommencingDate, String dateFormat) throws ParseException {
 		if(StringUtils.isNotEmpty(holdingAssetCommencingDate)){
-			this.holdingAssetCommencingDate = ParserUtility.convertToPimoneyDate(holdingAssetCommencingDate.trim(), dateFormat);
+			this.holdingAssetCommencingDate = AccountUtil.convertToDefaultDateFormat(holdingAssetCommencingDate.trim(), dateFormat);
 		}
 	}
 	/**
@@ -952,7 +984,7 @@ public class HoldingAsset {
 	}
 	public void setHoldingAssetCoupon(String holdingAssetCoupon, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetCoupon)){
-			this.holdingAssetCoupon = ParserUtility.formatAmount(holdingAssetCoupon.trim());
+			this.holdingAssetCoupon = AccountUtil.formatAmount(holdingAssetCoupon.trim());
 		}
 	}
 
@@ -967,12 +999,12 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetStrikePrice(String holdingAssetStrikePrice) {
 		if(StringUtils.isNotEmpty(holdingAssetStrikePrice)){
-			this.holdingAssetStrikePrice = holdingAssetStrikePrice;
+			this.holdingAssetStrikePrice = holdingAssetStrikePrice.trim();
 		}
 	}
 	public void setHoldingAssetStrikePrice(String holdingAssetStrikePrice, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetStrikePrice)){
-			this.holdingAssetStrikePrice = ParserUtility.formatAmount(holdingAssetStrikePrice.trim());
+			this.holdingAssetStrikePrice = AccountUtil.formatAmount(holdingAssetStrikePrice.trim());
 		}
 	}
 	/**
@@ -986,12 +1018,12 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetInterestTillMaturity(String holdingAssetInterestTillMaturity) {
 		if(StringUtils.isNotEmpty(holdingAssetInterestTillMaturity)){
-			this.holdingAssetInterestTillMaturity = holdingAssetInterestTillMaturity;
+			this.holdingAssetInterestTillMaturity = holdingAssetInterestTillMaturity.trim();
 		}
 	}
 	public void setHoldingAssetInterestTillMaturity(String holdingAssetInterestTillMaturity, boolean format) {
 		if(StringUtils.isNotEmpty(holdingAssetInterestTillMaturity)){
-			this.holdingAssetInterestTillMaturity = ParserUtility.formatAmount(holdingAssetInterestTillMaturity.trim());
+			this.holdingAssetInterestTillMaturity = AccountUtil.formatAmount(holdingAssetInterestTillMaturity.trim());
 		}
 	}
 	/**
@@ -1005,7 +1037,7 @@ public class HoldingAsset {
 	 */
 	public void setHoldingAssetOption(String holdingAssetOption) {
 		if(StringUtils.isNotEmpty(holdingAssetOption)){
-			this.holdingAssetOption = holdingAssetOption;
+			this.holdingAssetOption = holdingAssetOption.trim();
 		}
 	}
 	/**
@@ -1039,9 +1071,8 @@ public class HoldingAsset {
 		this.properties = properties;
 	}
 	public void setHash() {
-		String hash = ParserUtility.generateHash(this, properties);
+		String hash = AccountUtil.generateHash(this, properties);
 		setHoldingAssetHash(hash);
-		//logger.info("SET HASH --> "  + this.holdingAssetDescription + " :: " + this.fingerprint );
 	}
 
 
@@ -1064,7 +1095,9 @@ public class HoldingAsset {
 	 * @param transCode the transCode to set
 	 */
 	public void setTransCode(String transCode) {
-		this.transCode = transCode;
+		if(StringUtils.isNotEmpty(transCode)) {
+			this.transCode = transCode.trim();
+		}
 	}
 	/**
 	 * @return the assetCostDate
@@ -1077,7 +1110,9 @@ public class HoldingAsset {
 	 * @param assetCostDate the assetCostDate to set
 	 */
 	public void setAssetCostDate(String assetCostDate) {
-		this.assetCostDate = assetCostDate;
+		if(StringUtils.isNotEmpty(assetCostDate)) {
+			this.assetCostDate = assetCostDate.trim();
+		}
 	}
 	/**
 	 * @return the closingMethodCode
@@ -1092,7 +1127,9 @@ public class HoldingAsset {
 	 * @param closingMethodCode the closingMethodCode to set
 	 */
 	public void setClosingMethodCode(String closingMethodCode) {
-		this.closingMethodCode = closingMethodCode;
+		if(StringUtils.isNotEmpty(closingMethodCode)) {
+			this.closingMethodCode = closingMethodCode;
+		}
 	}
 	/**
 	 * @return the versusDate
@@ -1106,7 +1143,15 @@ public class HoldingAsset {
 	 * @param versusDate the versusDate to set
 	 */
 	public void setVersusDate(String versusDate) {
-		this.versusDate = versusDate;
+		if(StringUtils.isNotEmpty(versusDate)) {
+			this.versusDate = versusDate.trim();
+		}
+	}
+
+	public void setVersusDate(String versusDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(versusDate)) {
+			this.versusDate = AccountUtil.convertToDefaultDateFormat(versusDate.trim(), dateFormat);
+		}
 	}
 	/**
 	 * @return the srcDstType
@@ -1119,7 +1164,9 @@ public class HoldingAsset {
 	 * @param srcDstType the srcDstType to set
 	 */
 	public void setSrcDstType(String srcDstType) {
-		this.srcDstType = srcDstType;
+		if(StringUtils.isNotEmpty(srcDstType)) {
+			this.srcDstType = srcDstType.trim();
+		}
 	}
 	/**
 	 * @return the srcDstSymbol
@@ -1132,7 +1179,9 @@ public class HoldingAsset {
 	 * @param srcDstSymbol the srcDstSymbol to set
 	 */
 	public void setSrcDstSymbol(String srcDstSymbol) {
-		this.srcDstSymbol = srcDstSymbol;
+		if(StringUtils.isNotEmpty(srcDstSymbol)) {
+			this.srcDstSymbol = srcDstSymbol.trim();
+		}
 	}
 	/**
 	 * @return the tradeDateFxRate
@@ -1145,7 +1194,9 @@ public class HoldingAsset {
 	 * @param tradeDateFxRate the tradeDateFxRate to set
 	 */
 	public void setTradeDateFxRate(String tradeDateFxRate) {
-		this.tradeDateFxRate = tradeDateFxRate;
+		if(StringUtils.isNotEmpty(tradeDateFxRate)) {
+			this.tradeDateFxRate = tradeDateFxRate.trim();
+		}
 	}
 	/**
 	 * @return the valuationDateFxRate
@@ -1158,7 +1209,9 @@ public class HoldingAsset {
 	 * @param valuationDateFxRate the valuationDateFxRate to set
 	 */
 	public void setValuationDateFxRate(String valuationDateFxRate) {
-		this.valuationDateFxRate = valuationDateFxRate;
+		if(StringUtils.isNotEmpty(valuationDateFxRate)) {
+			this.valuationDateFxRate = valuationDateFxRate.trim();
+		}
 	}
 	/**
 	 * @return the assetOriginalFxRate
@@ -1171,7 +1224,9 @@ public class HoldingAsset {
 	 * @param assetOriginalFxRate the assetOriginalFxRate to set
 	 */
 	public void setAssetOriginalFxRate(String assetOriginalFxRate) {
-		this.assetOriginalFxRate = assetOriginalFxRate;
+		if(StringUtils.isNotEmpty(assetOriginalFxRate)) {
+			this.assetOriginalFxRate = assetOriginalFxRate.trim();
+		}
 	}
 	/**
 	 * @return the markToMarket
@@ -1186,7 +1241,9 @@ public class HoldingAsset {
 	 * @param markToMarket the markToMarket to set
 	 */
 	public void setMarkToMarket(String markToMarket) {
-		this.markToMarket = markToMarket;
+		if(StringUtils.isNotEmpty(markToMarket)) {
+			this.markToMarket = markToMarket.trim();
+		}
 	}
 	/**
 	 * @return the assetMTM
@@ -1199,7 +1256,9 @@ public class HoldingAsset {
 	 * @param assetMTM the assetMTM to set
 	 */
 	public void setAssetMTM(String assetMTM) {
-		this.assetMTM = assetMTM;
+		if(StringUtils.isNotEmpty(assetMTM)) {
+			this.assetMTM = assetMTM.trim();
+		}
 	}
 	/**
 	 * @return the assetWithholdingTax
@@ -1212,7 +1271,9 @@ public class HoldingAsset {
 	 * @param assetWithholdingTax the assetWithholdingTax to set
 	 */
 	public void setAssetWithholdingTax(String assetWithholdingText) {
-		this.assetWithholdingTax = assetWithholdingText;
+		if(StringUtils.isNotEmpty(assetWithholdingText)) {
+			this.assetWithholdingTax = assetWithholdingText.trim();
+		}
 	}
 	/**
 	 * @return the exchange
@@ -1225,7 +1286,9 @@ public class HoldingAsset {
 	 * @param exchange the exchange to set
 	 */
 	public void setExchange(String exchange) {
-		this.exchange = exchange;
+		if(StringUtils.isNotEmpty(exchange)) {
+			this.exchange = exchange.trim();
+		}
 	}
 	/**
 	 * @return the exchangeFee
@@ -1238,7 +1301,9 @@ public class HoldingAsset {
 	 * @param exchangeFee the exchangeFee to set
 	 */
 	public void setExchangeFee(String exchangeFee) {
-		this.exchangeFee = exchangeFee;
+		if(StringUtils.isNotEmpty(exchangeFee)) {
+			this.exchangeFee = exchangeFee.trim();
+		}
 	}
 	/**
 	 * @return the commission
@@ -1251,7 +1316,15 @@ public class HoldingAsset {
 	 * @param commission the commission to set
 	 */
 	public void setCommission(String commision) {
-		this.commission = commision;
+		if(StringUtils.isNotEmpty(commision)) {
+			this.commission = commision.trim();
+		}
+	}
+
+	public void setCommission(String commision, boolean format) {
+		if(StringUtils.isNotEmpty(commision)) {
+			this.commission = AccountUtil.formatAmount(commision.trim());
+		}
 	}
 	/**
 	 * @return the otherFees
@@ -1264,7 +1337,15 @@ public class HoldingAsset {
 	 * @param otherFees the otherFees to set
 	 */
 	public void setOtherFees(String otherFees) {
-		this.otherFees = otherFees;
+		if(StringUtils.isNotEmpty(otherFees)) {
+			this.otherFees = otherFees.trim();
+		}
+	}
+
+	public void setOtherFees(String otherFees, boolean format) {
+		if(StringUtils.isNotEmpty(otherFees)) {
+			this.otherFees = AccountUtil.formatAmount(otherFees).trim();
+		}
 	}
 	/**
 	 * @return the impliedCommission
@@ -1279,7 +1360,9 @@ public class HoldingAsset {
 	 * @param impliedCommission the impliedCommission to set
 	 */
 	public void setImpliedCommission(String impliedCommission) {
-		this.impliedCommission = impliedCommission;
+		if(StringUtils.isNotEmpty(impliedCommission)) {
+			this.impliedCommission = impliedCommission.trim();
+		}
 	}
 	/**
 	 * @return the commissionPurpose
@@ -1292,7 +1375,9 @@ public class HoldingAsset {
 	 * @param commissionPurpose the commissionPurpose to set
 	 */
 	public void setCommissionPurpose(String commissionPurpose) {
-		this.commissionPurpose = commissionPurpose;
+		if(StringUtils.isNotEmpty(commissionPurpose)) {
+			this.commissionPurpose = commissionPurpose.trim();
+		}
 	}
 	/**
 	 * @return the assetPledge
@@ -1305,7 +1390,9 @@ public class HoldingAsset {
 	 * @param assetPledge the assetPledge to set
 	 */
 	public void setAssetPledge(String assetPledge) {
-		this.assetPledge = assetPledge;
+		if(StringUtils.isNotEmpty(assetPledge)) {
+			this.assetPledge = assetPledge.trim();
+		}
 	}
 	/**
 	 * @return the destinationPledge
@@ -1318,7 +1405,9 @@ public class HoldingAsset {
 	 * @param destinationPledge the destinationPledge to set
 	 */
 	public void setDestinationPledge(String destinationPledge) {
-		this.destinationPledge = destinationPledge;
+		if(StringUtils.isNotEmpty(destinationPledge)) {
+			this.destinationPledge = destinationPledge.trim();
+		}
 	}
 	/**
 	 * @return the destinationCustodian
@@ -1331,7 +1420,9 @@ public class HoldingAsset {
 	 * @param destinationCustodian the destinationCustodian to set
 	 */
 	public void setDestinationCustodian(String destinationCustodian) {
-		this.destinationCustodian = destinationCustodian;
+		if(StringUtils.isNotEmpty(destinationCustodian)) {
+			this.destinationCustodian = destinationCustodian.trim();
+		}
 	}
 	/**
 	 * @return the assetDuration
@@ -1344,7 +1435,9 @@ public class HoldingAsset {
 	 * @param assetDuration the assetDuration to set
 	 */
 	public void setAssetDuration(String assetDuration) {
-		this.assetDuration = assetDuration;
+		if(StringUtils.isNotEmpty(assetDuration)) {
+			this.assetDuration = assetDuration.trim();
+		}
 	}
 	/**
 	 * @return the recordDate
@@ -1357,7 +1450,14 @@ public class HoldingAsset {
 	 * @param recordDate the recordDate to set
 	 */
 	public void setRecordDate(String recordDate) {
-		this.recordDate = recordDate;
+		if(StringUtils.isNotEmpty(recordDate)) {
+			this.recordDate = recordDate.trim();
+		}
+	}
+	public void setRecordDate(String recordDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(recordDate)) {
+			this.recordDate = AccountUtil.convertToDefaultDateFormat(recordDate.trim(), dateFormat);
+		}
 	}
 	/**
 	 * @return the strategy
@@ -1371,7 +1471,9 @@ public class HoldingAsset {
 	 * @param strategy the strategy to set
 	 */
 	public void setStrategy(String strategy) {
-		this.strategy = strategy;
+		if(StringUtils.isNotEmpty(strategy)) {
+			this.strategy = strategy.trim();
+		}
 	}
 	/**
 	 * @return the reclaimAmount
@@ -1384,8 +1486,17 @@ public class HoldingAsset {
 	 * @param reclaimAmount the reclaimAmount to set
 	 */
 	public void setReclaimAmount(String reclaimAmount) {
-		this.reclaimAmount = reclaimAmount;
+		if(StringUtils.isNotEmpty(reclaimAmount)) {
+			this.reclaimAmount = reclaimAmount.trim();
+		}
 	}
+
+	public void setReclaimAmount(String reclaimAmount, boolean format) {
+		if(StringUtils.isNotEmpty(reclaimAmount)) {
+			this.reclaimAmount = AccountUtil.formatAmount(reclaimAmount.trim());
+		}
+	}
+
 	/**
 	 * @return the accrualAccount
 	 */
@@ -1397,7 +1508,9 @@ public class HoldingAsset {
 	 * @param accrualAccount the accrualAccount to set
 	 */
 	public void setAccrualAccount(String accrualAccount) {
-		this.accrualAccount = accrualAccount;
+		if(StringUtils.isNotEmpty(accrualAccount)) {
+			this.accrualAccount = accrualAccount.trim();
+		}
 	}
 	/**
 	 * @return the dividendAccrualMethod
@@ -1411,7 +1524,9 @@ public class HoldingAsset {
 	 * @param dividendAccrualMethod the dividendAccrualMethod to set
 	 */
 	public void setDividendAccrualMethod(String dividendAccrualMethod) {
-		this.dividendAccrualMethod = dividendAccrualMethod;
+		if(StringUtils.isNotEmpty(dividendAccrualMethod)) {
+			this.dividendAccrualMethod = dividendAccrualMethod.trim();
+		}
 	}
 	/**
 	 * @return the mgmtFeePeriodDate
@@ -1432,7 +1547,9 @@ public class HoldingAsset {
 	 * @param mgmtFeePeriodDate the mgmtFeePeriodDate to set
 	 */
 	public void setMgmtFeePeriodDate(String mgmtFeePeriodDate) {
-		this.mgmtFeePeriodDate = mgmtFeePeriodDate;
+		if(StringUtils.isNotEmpty(mgmtFeePeriodDate)) {
+			this.mgmtFeePeriodDate = mgmtFeePeriodDate.trim();
+		}
 	}
 	/**
 	 * @return the recallable
@@ -1448,7 +1565,9 @@ public class HoldingAsset {
 	 * @param recallable the recallable to set
 	 */
 	public void setRecallable(String recallable) {
-		this.recallable = recallable;
+		if(StringUtils.isNotEmpty(recallable)) {
+			this.recallable = recallable.trim();
+		}
 	}
 	/**
 	 * @return the brokerFirmSymbol
@@ -1461,7 +1580,9 @@ public class HoldingAsset {
 	 * @param brokerFirmSymbol the brokerFirmSymbol to set
 	 */
 	public void setBrokerFirmSymbol(String brokerFirmSymbol) {
-		this.brokerFirmSymbol = brokerFirmSymbol;
+		if(StringUtils.isNotEmpty(brokerFirmSymbol)) {
+			this.brokerFirmSymbol = brokerFirmSymbol.trim();
+		}
 	}
 	/**
 	 * @return the committedCapital
@@ -1478,7 +1599,15 @@ public class HoldingAsset {
 	 * @param committedCapital the committedCapital to set
 	 */
 	public void setCommittedCapital(String commitedCapital) {
-		this.committedCapital = commitedCapital;
+		if(StringUtils.isNotEmpty(commitedCapital)) {
+			this.committedCapital = commitedCapital.trim();
+		}
+	}
+
+	public void setCommittedCapital(String commitedCapital, boolean format) {
+		if(StringUtils.isNotEmpty(commitedCapital)) {
+			this.committedCapital = AccountUtil.formatAmount(commitedCapital.trim());
+		}
 	}
 	/**
 	 * @return the contributedCapital
@@ -1490,7 +1619,15 @@ public class HoldingAsset {
 	 * amount of any contributions for a private equity fund at the time of the trade.
 	 */
 	public void setContributedCapital(String contributedCapital) {
-		this.contributedCapital = contributedCapital;
+		if(StringUtils.isNotEmpty(contributedCapital)) {
+			this.contributedCapital = contributedCapital.trim();
+		}
+	}
+
+	public void setContributedCapital(String contributedCapital, boolean format) {
+		if(StringUtils.isNotEmpty(contributedCapital)) {
+			this.contributedCapital = AccountUtil.formatAmount(contributedCapital.trim());
+		}
 	}
 
 
@@ -1509,7 +1646,9 @@ public class HoldingAsset {
 	 * @param securityType the securityType to set
 	 */
 	public void setSecurityType(String securityType) {
-		this.securityType = securityType;
+		if(StringUtils.isNotEmpty(securityType)) {
+			this.securityType = securityType.trim();
+		}
 	}
 	/**
 	 * @return the destinationCurrency
@@ -1522,7 +1661,9 @@ public class HoldingAsset {
 	 * @param destinationCurrency the destinationCurrency to set
 	 */
 	public void setDestinationCurrency(String destinationCurrency) {
-		this.destinationCurrency = destinationCurrency;
+		if(StringUtils.isNotEmpty(destinationCurrency)) {
+			this.destinationCurrency = destinationCurrency.trim();
+		}
 	}
 	/**
 	 * @return the assetTicker
@@ -1535,7 +1676,9 @@ public class HoldingAsset {
 	 * @param assetTicker the assetTicker to set
 	 */
 	public void setAssetTicker(String assetTicker) {
-		this.assetTicker = assetTicker;
+		if(StringUtils.isNotEmpty(assetTicker)) {
+			this.assetTicker = assetTicker.trim();
+		}
 	}
 	/**
 	 * @return the assetCUSIP
@@ -1548,7 +1691,9 @@ public class HoldingAsset {
 	 * @param assetCUSIP the assetCUSIP to set
 	 */
 	public void setAssetCUSIP(String assetCUSIP) {
-		this.assetCUSIP = assetCUSIP;
+		if(StringUtils.isNotEmpty(assetCUSIP)) {
+			this.assetCUSIP = assetCUSIP.trim();
+		}
 	}
 	/**
 	 * @return the assetSEDOL
@@ -1561,7 +1706,9 @@ public class HoldingAsset {
 	 * @param assetSEDOL the assetSEDOL to set
 	 */
 	public void setAssetSEDOL(String assetSEDOL) {
-		this.assetSEDOL = assetSEDOL;
+		if(StringUtils.isNotEmpty(assetSEDOL)) {
+			this.assetSEDOL = assetSEDOL.trim();
+		}
 	}
 	/**
 	 * @return the assetQUIK
@@ -1574,7 +1721,9 @@ public class HoldingAsset {
 	 * @param assetQUIK the assetQUIK to set
 	 */
 	public void setAssetQUIK(String assetQUIK) {
-		this.assetQUIK = assetQUIK;
+		if(StringUtils.isNotEmpty(assetQUIK)) {
+			this.assetQUIK = assetQUIK.trim();
+		}
 	}
 	/**
 	 * @return the fxDenominatorCurrency
@@ -1587,7 +1736,9 @@ public class HoldingAsset {
 	 * @param fxDenominatorCurrency the fxDenominatorCurrency to set
 	 */
 	public void setFxDenominatorCurrency(String fxDenominatorCurrency) {
-		this.fxDenominatorCurrency = fxDenominatorCurrency;
+		if(StringUtils.isNotEmpty(fxDenominatorCurrency)) {
+			this.fxDenominatorCurrency = fxDenominatorCurrency.trim();
+		}
 	}
 	/**
 	 * @return the fxNumeratorCurrency
@@ -1600,7 +1751,9 @@ public class HoldingAsset {
 	 * @param fxNumeratorCurrency the fxNumeratorCurrency to set
 	 */
 	public void setFxNumeratorCurrency(String fxNumeratorCurrency) {
-		this.fxNumeratorCurrency = fxNumeratorCurrency;
+		if(StringUtils.isNotEmpty(fxNumeratorCurrency)) {
+			this.fxNumeratorCurrency = fxNumeratorCurrency.trim();
+		}
 	}
 	/**
 	 * @return the underBloombergTicker
@@ -1613,7 +1766,9 @@ public class HoldingAsset {
 	 * @param underBloombergTicker the underBloombergTicker to set
 	 */
 	public void setUnderBloombergTicker(String underBloombergTicker) {
-		this.underBloombergTicker = underBloombergTicker;
+		if(StringUtils.isNotEmpty(underBloombergTicker)) {
+			this.underBloombergTicker = underBloombergTicker.trim();
+		}
 	}
 	/**
 	 * @return the underCUSIP
@@ -1626,7 +1781,9 @@ public class HoldingAsset {
 	 * @param underCUSIP the underCUSIP to set
 	 */
 	public void setUnderCUSIP(String underCUSIP) {
-		this.underCUSIP = underCUSIP;
+		if(StringUtils.isNotEmpty(underCUSIP)) {
+			this.underCUSIP = underCUSIP.trim();
+		}
 	}
 	/**
 	 * @return the underISIN
@@ -1639,7 +1796,9 @@ public class HoldingAsset {
 	 * @param underISIN the underISIN to set
 	 */
 	public void setUnderISIN(String underISIN) {
-		this.underISIN = underISIN;
+		if(StringUtils.isNotEmpty(underISIN)) {
+			this.underISIN = underISIN.trim();
+		}
 	}
 	/**
 	 * @return the underRIC
@@ -1652,7 +1811,9 @@ public class HoldingAsset {
 	 * @param underRIC the underRIC to set
 	 */
 	public void setUnderRIC(String underRIC) {
-		this.underRIC = underRIC;
+		if(StringUtils.isNotEmpty(underRIC)) {
+			this.underRIC = underRIC.trim();
+		}
 	}
 	/**
 	 * @return the underSEDOL
@@ -1665,7 +1826,9 @@ public class HoldingAsset {
 	 * @param underSEDOL the underSEDOL to set
 	 */
 	public void setUnderSEDOL(String underSEDOL) {
-		this.underSEDOL = underSEDOL;
+		if(StringUtils.isNotEmpty(underSEDOL)) {
+			this.underSEDOL = underSEDOL.trim();
+		}
 	}
 	/**
 	 * @return the underTicker
@@ -1678,7 +1841,9 @@ public class HoldingAsset {
 	 * @param underTicker the underTicker to set
 	 */
 	public void setUnderTicker(String underTicker) {
-		this.underTicker = underTicker;
+		if(StringUtils.isNotEmpty(underTicker)) {
+			this.underTicker = underTicker.trim();
+		}
 	}
 	/**
 	 * @return the priceFactor
@@ -1691,7 +1856,9 @@ public class HoldingAsset {
 	 * @param priceFactor the priceFactor to set
 	 */
 	public void setPriceFactor(String priceFactor) {
-		this.priceFactor = priceFactor;
+		if(StringUtils.isNotEmpty(priceFactor)) {
+			this.priceFactor = priceFactor.trim();
+		}
 	}
 	/**
 	 * @return the basePrice
@@ -1704,7 +1871,9 @@ public class HoldingAsset {
 	 * @param basePrice the basePrice to set
 	 */
 	public void setBasePrice(String basePrice) {
-		this.basePrice = basePrice;
+		if(StringUtils.isNotEmpty(basePrice)) {
+			this.basePrice = basePrice.trim();
+		}
 	}
 	/**
 	 * @return the accountCurrency
@@ -1717,7 +1886,9 @@ public class HoldingAsset {
 	 * @param accountCurrency the accountCurrency to set
 	 */
 	public void setAccountCurrency(String accountCurrency) {
-		this.accountCurrency = accountCurrency;
+		if(StringUtils.isNotEmpty(accountCurrency)) {
+			this.accountCurrency = accountCurrency.trim();
+		}
 	}
 	/**
 	 * @return the settlementCurrency
@@ -1730,7 +1901,9 @@ public class HoldingAsset {
 	 * @param settlementCurrency the settlementCurrency to set
 	 */
 	public void setSettlementCurrency(String settlementCurrency) {
-		this.settlementCurrency = settlementCurrency;
+		if(StringUtils.isNotEmpty(settlementCurrency)) {
+			this.settlementCurrency = settlementCurrency.trim();
+		}
 	}
 	/**
 	 * @return the corpActionsIndicator
@@ -1743,7 +1916,9 @@ public class HoldingAsset {
 	 * @param corpActionsIndicator the corpActionsIndicator to set
 	 */
 	public void setCorpActionsIndicator(String corpActionsIndicator) {
-		this.corpActionsIndicator = corpActionsIndicator;
+		if(StringUtils.isNotEmpty(corpActionsIndicator)) {
+			this.corpActionsIndicator = corpActionsIndicator.trim();
+		}
 	}
 	/**
 	 * @return the tradeDate
@@ -1756,11 +1931,15 @@ public class HoldingAsset {
 	 * @param tradeDate the tradeDate to set
 	 */
 	public void setTradeDate(String tradeDate) {
-		this.tradeDate = tradeDate;
+		if(StringUtils.isNotEmpty(tradeDate)) {
+			this.tradeDate = tradeDate;
+		}
 	}
-	
+
 	public void setTradeDate(String tradeDate, String dateFormat) throws ParseException {
-		this.tradeDate = ParserUtility.convertToPimoneyDate(tradeDate, dateFormat);
+		if(StringUtils.isNotEmpty(tradeDate)) {
+			this.tradeDate = AccountUtil.convertToDefaultDateFormat(tradeDate, dateFormat);
+		}
 	}
 	/**
 	 * @return the settlementDate
@@ -1773,7 +1952,14 @@ public class HoldingAsset {
 	 * @param settlementDate the settlementDate to set
 	 */
 	public void setSettlementDate(String settlementDate) {
-		this.settlementDate = settlementDate;
+		if(StringUtils.isNotEmpty(settlementDate)) {
+			this.settlementDate = settlementDate.trim();
+		}
+	}
+	public void setSettlementDate(String settlementDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(settlementDate)) {
+			this.settlementDate = AccountUtil.convertToDefaultDateFormat(settlementDate.trim(), dateFormat);
+		}
 	}
 	/**
 	 * @return the assetRIC
@@ -1813,7 +1999,15 @@ public class HoldingAsset {
 	 * @param lastTradeDate the lastTradeDate to set
 	 */
 	public void setLastTradeDate(String lastTradeDate) {
-		this.lastTradeDate = lastTradeDate;
+		if(StringUtils.isNotEmpty(lastTradeDate)) {
+			this.lastTradeDate = lastTradeDate.trim();
+		}
+	}
+
+	public void setLastTradeDate(String lastTradeDate, String dateFormat) throws ParseException {
+		if(StringUtils.isNotEmpty(lastTradeDate)) {
+			this.lastTradeDate = AccountUtil.convertToDefaultDateFormat(lastTradeDate.trim(), dateFormat);
+		}
 	}
 	/**
 	 * @return the dividendReInvestIndicator
@@ -1827,7 +2021,9 @@ public class HoldingAsset {
 	 * @param dividendReInvestIndicator the dividendReInvestIndicator to set
 	 */
 	public void setDividendReInvestIndicator(String dividendReInvestIndicator) {
-		this.dividendReInvestIndicator = dividendReInvestIndicator;
+		if(StringUtils.isNotEmpty(dividendReInvestIndicator)) {
+			this.dividendReInvestIndicator = dividendReInvestIndicator.trim();
+		}
 	}
 	/**
 	 * @return the optionType
@@ -1842,7 +2038,9 @@ public class HoldingAsset {
 	 * @param optionType the optionType to set
 	 */
 	public void setOptionType(String optionType) {
-		this.optionType = optionType;
+		if(StringUtils.isNotEmpty(optionType)) {
+			this.optionType = optionType.trim();
+		}
 	}
 	/**
 	 * @return the securityCountryCode
@@ -1857,7 +2055,9 @@ public class HoldingAsset {
 	 * @param securityCountryCode the securityCountryCode to set
 	 */
 	public void setSecurityCountryCode(String securityCountryCode) {
-		this.securityCountryCode = securityCountryCode;
+		if(StringUtils.isNotEmpty(securityCountryCode)) {
+			this.securityCountryCode = securityCountryCode.trim();
+		}
 	}
 	/**
 	 * @return the vAT
@@ -1870,7 +2070,15 @@ public class HoldingAsset {
 	 * @param vAT the vAT to set
 	 */
 	public void setVAT(String vAT) {
-		VAT = vAT;
+		if(StringUtils.isNotEmpty(vAT)) {
+			VAT = vAT.trim();
+		}
+	}
+
+	public void setVAT(String vAT, boolean format) {
+		if(StringUtils.isNotEmpty(vAT)) {
+			VAT = AccountUtil.formatAmount(vAT.trim());
+		}
 	}
 	/**
 	 * @return the investmentObjective
@@ -1888,8 +2096,14 @@ public class HoldingAsset {
 	 * @param investmentObjective the investmentObjective to set
 	 */
 	public void setInvestmentObjective(String investmentObjective) {
-		this.investmentObjective = investmentObjective;
+		if(StringUtils.isNotEmpty(investmentObjective)) {
+			this.investmentObjective = investmentObjective.trim();
+		}
 	}
 	
-	
+	public Object clone()throws CloneNotSupportedException{  
+		return super.clone();  
+	}  
+
+
 }

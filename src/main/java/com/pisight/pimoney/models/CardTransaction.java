@@ -1,13 +1,18 @@
 package com.pisight.pimoney.models;
 
-import com.pisight.pimoney.beans.ParserUtility;
+import java.io.Serializable;
 
-public class CardTransaction extends TransactionBase{
+import com.pisight.pimoney.constants.Constants;
+import com.pisight.pimoney.util.AccountUtil;
+
+public class CardTransaction extends TransactionBase implements Serializable{
 	
+	private static final long serialVersionUID = -483215873076545243L;
 	public static final String TRANSACTION_TYPE_DEBIT = "debit";
 	public static final String TRANSACTION_TYPE_CREDIT = "credit";
 	
 	private String transDate = "";
+	private String postDate = "";
 	private String description = "";
 	private String amount = "";
 	private String transactionType = "";
@@ -15,7 +20,7 @@ public class CardTransaction extends TransactionBase{
 	private String currency = "";
 	private String dateFormat = "";
 	
-	
+	private static final String tag = Constants.TAG_CARD;
 	
 	public String getCurrency() {
 		return currency;
@@ -34,6 +39,12 @@ public class CardTransaction extends TransactionBase{
 	}
 	public void setTransDate(String transDate) {
 		this.transDate = transDate;
+	}
+	public String getPostDate() {
+		return postDate;
+	}
+	public void setPostDate(String postDate) {
+		this.postDate = postDate;
 	}
 	public String getDescription() {
 		return description;
@@ -61,7 +72,11 @@ public class CardTransaction extends TransactionBase{
 		this.dateFormat = dateFormat;
 	}
 	public void setHash(){
-		String hash = ParserUtility.generateHash(this, properties);
+		String hash = AccountUtil.generateHash(this, getProperties());
 		setFingerprint(hash);
+	}
+	@Override
+	public String getTag() {
+		return tag;
 	}
 }

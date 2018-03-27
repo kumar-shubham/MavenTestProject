@@ -6,13 +6,23 @@ import java.util.List;
 
 public class Constants {
 	
+	public enum Source{Parser, Scraped};
+	
 	public static final String TAG_BANK = "Bank";
 	public static final String TAG_CARD = "Card";
 	public static final String TAG_LOAN = "Loan";
 	public static final String TAG_FIXED_DEPOSIT = "Fixed Deposit";
 	public static final String TAG_INVESTMENT = "Investment";
+	public static final String TAG_GENERIC = "Generic";
+	
+	public static final String FIELD_TYPE_STRING = "String";
+	public static final String FIELD_TYPE_BOOLEAN = "Boolean";
+	public static final String FIELD_TYPE_DATE = "Date";
+	public static final String FIELD_TYPE_INTEGER = "Integer";
+	public static final String FIELD_TYPE_DOUBLE = "Double";
 	
 	public static final String DATEFORMAT_MM_SPACE_DD_SPACE_YYYY = "MM dd yyyy";
+	public static final String DATEFORMAT_MM_DD_YYYY = "MMddyyyy";
 	public static final String DATEFORMAT_DD_SPACE_MMM_SPACE_YYYY = "dd MMM yyyy";
 	public static final String DATEFORMAT_MMM_SPACE_DD_COMMA_YYYY = "MMM dd,yyyy";
 	public static final String DATEFORMAT_DD_DASH_MM_DASH_YYYY = "dd-MM-yyyy";
@@ -134,6 +144,10 @@ public class Constants {
 	public static final String STATEMENT_TYPE_TRANSACTION1 = "transaction";
 	public static final String STATEMENT_TYPE_PORTFOLIO1 = "portfolio";
 	
+	public static final String FIELD_TRANSACTION = "Transaction";
+	public static final String FIELD_ASSET = "Asset";
+	public static final String FIELD_GENERIC = "Generic";
+	
 	public static final HashMap<String, String> ACA_STATUS_MAP = new HashMap<String, String>();
 	public static final HashMap<String, String> TAG_CONTAINER_MAP = new HashMap<String, String>();
 	
@@ -165,6 +179,7 @@ public class Constants {
 		dateFormatList.add(DATEFORMAT_MM_SLASH_DD_SLASH_YYYY);
 		dateFormatList.add(DATEFORMAT_DD_SPACE_MMM_COMMA_SPACE_YYYY);
 		dateFormatList.add(DATEFORMAT_DD_SPACE_MMM_COMMA_YYYY);
+		dateFormatList.add(DATEFORMAT_MM_DD_YYYY);
 		
 		TAG_CONTAINER_MAP.put(Constants.TAG_BANK, "com.pisight.pimoney.models.BankAccount");
 		TAG_CONTAINER_MAP.put(Constants.TAG_CARD, "com.pisight.pimoney.models.CardAccount");

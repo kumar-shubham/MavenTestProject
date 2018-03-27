@@ -21,6 +21,11 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * @author kumar
+ * This class tests the vision api
+ *
+ */
 public class GoogleOCR1 {
 
 	public static final String TABLE_ID					=	"PDF_TO_HTML";
@@ -35,7 +40,7 @@ public class GoogleOCR1 {
 		// TODO Auto-generated method stub
 
 
-		String result = getHTML(getFile("images","IMG_3659", "JPG"));
+		String result = getHTML(getFile("images","India-Travel-policy-Bajaj-Allianz-3", "jpg"));
 		
 		result = TABLE_OPENING + result + TABLE_CLOSING;
 		

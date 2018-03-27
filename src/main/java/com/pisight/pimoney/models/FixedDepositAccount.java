@@ -1,46 +1,59 @@
 package com.pisight.pimoney.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import com.pisight.pimoney.constants.Constants;
 
-public class FixedDepositAccount extends Container {
-	
-	
-//	public FixedDepositAccount() {
-//		setTag(Constants.TAG_FIXED_DEPOSIT);
-//	}
-	
+public class FixedDepositAccount extends Container implements Serializable{
+
+	private static final long serialVersionUID = -5627095321122978087L;
+
+
+
+	public FixedDepositAccount() {
+		setTag(Constants.TAG_FIXED_DEPOSIT);
+	}
+
 	public FixedDepositAccount(HashMap<String, String> properties) {
 		setTag(Constants.TAG_FIXED_DEPOSIT);
-		this.properties = properties;
+		setProperties(properties);
 		String bankId = "" + properties.get(Constants.USER_ID) + properties.get(Constants.INSTITUTION_CODE);
 		setBankId("manual-" + bankId.hashCode());
 	}
-	
-	
+
+
 	@Override
 	public String getTag() {
 		// TODO Auto-generated method stub
 		return Constants.TAG_FIXED_DEPOSIT;
 	}
-	
-	private HashMap<String, String> properties = new HashMap<String, String>();
-	
-	private String accountNumber = "";
-	
-	private String accountName = "";
-	
-	private String prinipleAmount = "";
-	
-	private String maturityAmount = "";
-	
-	private String startDate = "";
-	
-	private String maturityDate = "";
-	
-	private String interestRate = "";
-	
+
+
+	private String accountNumber = null;
+
+	private String accountName = null;
+
+	private String principleAmount = null;
+
+	private String maturityAmount = null;
+
+	private String startDate = null;
+
+	private String maturityDate = null;
+
+	private String interestRate = null;
+
+	private String interestPayout = null;
+
+	private String interestComputationFrequency  = null;
+
+	// this index shows whether the account has account details or it is just for 
+	// process completion
+	private int usability = 1;
+
+
+
 	public String getAccountNumber() {
 		return accountNumber;
 	}
@@ -57,12 +70,12 @@ public class FixedDepositAccount extends Container {
 		this.accountName = accountName;
 	}
 
-	public String getPrinipleAmount() {
-		return prinipleAmount;
+	public String getPrincipleAmount() {
+		return principleAmount;
 	}
 
-	public void setPrinipleAmount(String prinipleAmount) {
-		this.prinipleAmount = prinipleAmount;
+	public void setPrincipleAmount(String prinipleAmount) {
+		this.principleAmount = prinipleAmount;
 	}
 
 	public String getMaturityAmount() {
@@ -96,7 +109,48 @@ public class FixedDepositAccount extends Container {
 	public void setInterestRate(String interestRate) {
 		this.interestRate = interestRate;
 	}
-	
-	
+
+	/**
+	 * @return the interestComputationFrequency
+	 */
+	public String getInterestComputationFrequency() {
+		return interestComputationFrequency;
+	}
+
+	/**
+	 * @param interestComputationFrequency the interestComputationFrequency to set
+	 */
+	public void setInterestComputationFrequency(String interestComputationFrequency) {
+		this.interestComputationFrequency = interestComputationFrequency;
+	}
+
+	/**
+	 * @return the interestPayout
+	 */
+	public String getInterestPayout() {
+		return interestPayout;
+	}
+
+	/**
+	 * @param interestPayout the interestPayout to set
+	 */
+	public void setInterestPayout(String interestPayout) {
+		this.interestPayout = interestPayout;
+	}
+
+	/**
+	 * @return the usability
+	 */
+	public int getUsability() {
+		return usability;
+	}
+
+	/**
+	 * @param usability the usability to set
+	 */
+	public void setUsability(int usability) {
+		this.usability = usability;
+	}
+
 
 }

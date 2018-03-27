@@ -1,11 +1,17 @@
 package com.pisight.pimoney.models;
 
-public class LoanTransaction extends TransactionBase{
+import java.io.Serializable;
+
+import com.pisight.pimoney.constants.Constants;
+
+public class LoanTransaction extends TransactionBase implements Serializable{
 	
+	private static final long serialVersionUID = 1176764273639940541L;
 	public static final String TRANSACTION_TYPE_DEBIT = "debit";
 	public static final String TRANSACTION_TYPE_CREDIT = "credit";
 	
 	private String transDate = "";
+	private String postDate = "";
 	private String description = "";
 	private String amount = "";
 	private String transactionType = "";
@@ -13,7 +19,7 @@ public class LoanTransaction extends TransactionBase{
 	private String currency = "";
 	private String dateFormat = "";
 	
-	
+	private static final String tag = Constants.TAG_LOAN;
 	
 	/**
 	 * @return the accountNumber
@@ -32,6 +38,12 @@ public class LoanTransaction extends TransactionBase{
 	}
 	public void setTransDate(String transDate) {
 		this.transDate = transDate;
+	}
+	public String getPostDate() {
+		return postDate;
+	}
+	public void setPostDate(String postDate) {
+		this.postDate = postDate;
 	}
 	public String getDescription() {
 		return description;
@@ -63,6 +75,10 @@ public class LoanTransaction extends TransactionBase{
 	}
 	public void setDateFormat(String dateFormat) {
 		this.dateFormat = dateFormat;
+	}
+	@Override
+	public String getTag() {
+		return tag;
 	}
 	
 

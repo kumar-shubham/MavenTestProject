@@ -1,13 +1,15 @@
 package my;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Period;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class Test {
 
@@ -24,6 +26,8 @@ public class Test {
 		System.out.println(firstMonday);*/
 		
 //		Calendar aCalendar = Calendar.getInstance();
+//		aCalendar.set(Calendar.YEAR, 2011);
+//		aCalendar.set(Calendar.MONTH, 11);
 //		aCalendar.set(Calendar.DATE, 1);
 //		aCalendar.add(Calendar.DAY_OF_MONTH, -1);
 //		Date lastDateOfPreviousMonth = aCalendar.getTime();
@@ -41,20 +45,58 @@ public class Test {
 //		
 //		System.out.println(id);
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyy");
+//		SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyy");
+//		
+//		Date dob = sdf.parse("12201991");
+//		
+//		LocalDate today = LocalDate.now();
+//		LocalDate birthday = new java.sql.Date( dob.getTime() ).toLocalDate();
+//
+//		Period p = Period.between(birthday, today);
+//		
+//		System.out.println(p.getYears());
+//		System.out.println(p.getMonths());
+//		System.out.println(p.getDays());
 		
-		Date dob = sdf.parse("12201991");
+//		System.out.println(formatDecimal(".111122", 3));
 		
-		LocalDate today = LocalDate.now();
-		LocalDate birthday = new java.sql.Date( dob.getTime() ).toLocalDate();
+		test1();
+		
+		
+	}
+	
+	private static void test1() {
+		ZoneId america = ZoneId.of("Asia/Singapore");
+		LocalDateTime localtDateAndTime = LocalDateTime.now();
+		ZonedDateTime dateAndTimeInNewYork  = ZonedDateTime.of(localtDateAndTime, america );
+		System.out.println("Current date and time in a particular timezone : " + dateAndTimeInNewYork);
+		System.out.println(dateAndTimeInNewYork.toLocalDateTime());
+		System.out.println(dateAndTimeInNewYork.withFixedOffsetZone());
+		 
 
-		Period p = Period.between(birthday, today);
-		
-		System.out.println(p.getYears());
-		System.out.println(p.getMonths());
-		System.out.println(p.getDays());
-		
-		
+
+
+		     
+	}
+	
+	public static final String formatDecimal(String number, int noOfDecimals) {
+		if(StringUtils.isEmpty(number)) {
+			return null;
+		}
+		number = number.replace(",", "");
+		if(number.indexOf(".") < 0 || number.substring(number.indexOf(".")+1).length() <= noOfDecimals ) {
+			return number;
+		}
+		Double num = Double.valueOf(number);
+		String str = buildStringWithChar(noOfDecimals, "0");
+		NumberFormat formatter = new DecimalFormat("#0."+str);    
+		return formatter.format(num);
+	}
+	
+	private static String buildStringWithChar(int i, String s) {
+		CharSequence[] array = new CharSequence[i];
+		Arrays.fill(array, s);
+		return String.join("", array);
 	}
 	
 	public static int getFirstMonday(int year, int month) {
