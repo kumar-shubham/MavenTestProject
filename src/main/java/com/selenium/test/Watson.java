@@ -914,7 +914,8 @@ public class Watson {
 		String tempFileLocation = System.getProperty("user.home") + "/public/tmp/";
 		String randomString = RandomStringUtils.randomAlphanumeric(8);
 		tempFileLocation += randomString + "/";
-
+		System.out.println("download path => " + downloadFileLocation);
+		
 		File directory = new File(downloadFileLocation	);
 		if(!directory.exists()){
 			directory.mkdirs();

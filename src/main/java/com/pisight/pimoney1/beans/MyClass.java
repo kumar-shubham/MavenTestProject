@@ -42,7 +42,7 @@ public class MyClass {
 		PDFExtracter boxTest = null;
 
 		String folder = "investments/new";
-		String filename = "COUTTS_SG_INV";
+		String filename = "SG_BOS_HP";
 
 		try {
 			boxTest = new PDFExtracter(getFile(folder, filename, "pdf"), "");
@@ -66,8 +66,8 @@ public class MyClass {
 		writeFile(htmlfilepath.toString(), driver.getPageSource());
 
 		try {
-			// scrapeStatement(driver);
-			ParserResponse response = callParser("SG", "Coutts", p.toString());
+			 //scrapeStatement(driver);
+			ParserResponse response = callParser("SG", "Bank of Singapore", p.toString());
 			System.out.println();
 			System.out.println();
 			System.out.println("asset xml");
@@ -121,9 +121,10 @@ public class MyClass {
 
 	private static ParserResponse callParser(String locale, String parser, String filepath) throws Exception {
 
+		System.out.println("Call Parser Called....");
 		String docByte = getBase64(filepath);
 
-		String url = "http://192.168.0.15:8085/parserengine/parse";
+		String url = "http://192.168.0.15:8082/parse";
 
 		ACAHttpClient client = new ACAHttpClient(url, ACAHttpClient.REQUEST_TYPE_POST);
 
@@ -132,6 +133,8 @@ public class MyClass {
 		client.setDataField("locale", locale);
 		client.setDataField("name", parser);
 		client.setDataField("docByte", docByte);
+		client.setDataField("outputFileGroup", "taurus");
+		client.setDataField("headerGroup", "taurus");
 
 		String result = client.getResponseForPostRequest();
 

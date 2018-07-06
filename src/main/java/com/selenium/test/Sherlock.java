@@ -76,8 +76,10 @@ public class Sherlock {
 	public String getDownloadFileLocation(){
 		String location = null;
 		if(acaDriver != null){
+			System.out.println("acaDriver");
 			location = acaDriver.getDownloadFileLocation();
 		}
+		System.out.println("location => " + location);
 		return location;
 	}
 	
@@ -484,6 +486,20 @@ public class Sherlock {
 			}
 
 		}
+	}
+
+	/**
+	 * @return the acaDriver
+	 */
+	public ACADriver getAcaDriver() {
+		return acaDriver;
+	}
+
+	/**
+	 * @param acaDriver the acaDriver to set
+	 */
+	public void setAcaDriver(ACADriver acaDriver) {
+		this.acaDriver = acaDriver;
 	}
 
 }

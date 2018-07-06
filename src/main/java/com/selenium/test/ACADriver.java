@@ -47,7 +47,7 @@ public class ACADriver {
 			System.setProperty("webdriver.chrome.driver",p.toString() );
 			System.out.println("::::::::::::::::sssssssssss :::::::: " + System.getProperty("webdriver.chrome.driver"));
 			
-			String downloadFilepath = System.getProperty("user.home") + "/public/download/";
+			String downloadFilepath = System.getProperty("user.home") + "/public/download/secutitydata/nse/";
 			String randomString = RandomStringUtils.randomAlphanumeric(8);
 			downloadFilepath += randomString + "/";
 			downloadFileLocation = downloadFilepath;

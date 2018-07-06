@@ -82,6 +82,18 @@ public class ParserResponse implements Cloneable, Serializable{
 	private String objectByte = null;
 	
 	private boolean fromObject = false;
+	
+	private String JSONByteAsstes = null;
+    
+    private String JSONByteTrans = null;
+    
+    private String JSONByteSCX = null;
+    
+	private String csvByteAsstes = null;
+	
+	private String csvByteTrans = null;
+	
+	private String csvByteSCX = null;
 
 	/**
 	 * @return the statementType
@@ -549,5 +561,88 @@ public class ParserResponse implements Cloneable, Serializable{
 	public void setFromObject(boolean fromObject) {
 		this.fromObject = fromObject;
 	}
-	
+
+	/**
+	 * @return the jSONByteAsstes
+	 */
+	public String getJSONByteAsstes() {
+		return JSONByteAsstes;
+	}
+
+	/**
+	 * @param jSONByteAsstes the jSONByteAsstes to set
+	 */
+	public void setJSONByteAsstes(String jSONByteAsstes) {
+		JSONByteAsstes = jSONByteAsstes;
+	}
+
+	/**
+	 * @return the jSONByteTrans
+	 */
+	public String getJSONByteTrans() {
+		return JSONByteTrans;
+	}
+
+	/**
+	 * @param jSONByteTrans the jSONByteTrans to set
+	 */
+	public void setJSONByteTrans(String jSONByteTrans) {
+		JSONByteTrans = jSONByteTrans;
+	}
+
+	/**
+	 * @return the jSONByteSCX
+	 */
+	public String getJSONByteSCX() {
+		return JSONByteSCX;
+	}
+
+	/**
+	 * @param jSONByteSCX the jSONByteSCX to set
+	 */
+	public void setJSONByteSCX(String jSONByteSCX) {
+		JSONByteSCX = jSONByteSCX;
+	}
+
+	/**
+	 * @return the csvByteAsstes
+	 */
+	public String getCsvByteAsstes() {
+		return csvByteAsstes;
+	}
+
+	/**
+	 * @param csvByteAsstes the csvByteAsstes to set
+	 */
+	public void setCsvByteAsstes(String csvByteAsstes) {
+		this.csvByteAsstes = csvByteAsstes;
+	}
+
+	/**
+	 * @return the csvByteTrans
+	 */
+	public String getCsvByteTrans() {
+		return csvByteTrans;
+	}
+
+	/**
+	 * @param csvByteTrans the csvByteTrans to set
+	 */
+	public void setCsvByteTrans(String csvByteTrans) {
+		this.csvByteTrans = csvByteTrans;
+	}
+
+	/**
+	 * @return the csvByteSCX
+	 */
+	public String getCsvByteSCX() {
+		return csvByteSCX;
+	}
+
+	/**
+	 * @param csvByteSCX the csvByteSCX to set
+	 */
+	public void setCsvByteSCX(String csvByteSCX) {
+		this.csvByteSCX = csvByteSCX;
+	}
 }
