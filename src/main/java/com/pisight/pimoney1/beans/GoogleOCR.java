@@ -26,7 +26,7 @@ public class GoogleOCR {
 
 	private static final String LINE_SEPARATOR			=	"</td></tr><tr><td>";
 	
-	private static final String API_KEY = "AIzaSyDhSGVyNV5u86n7CTOvDhgC59TJFYTvVSI";
+	private static final String API_KEY = "";
 	
 	private static Logger LOGGER = Logger.getLogger(GoogleOCR.class.getName());
 
