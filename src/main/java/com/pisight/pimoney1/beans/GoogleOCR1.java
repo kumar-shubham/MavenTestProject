@@ -51,7 +51,7 @@ public class GoogleOCR1 {
 	}
 
 	public static String getHTML(File file){
-		String ocrURL = "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyC3K1d02FWbOeIMPYa_I7sFkOAsZmsbU0w";
+		String ocrURL = "https://vision.googleapis.com/v1/images:annotate?key=";
 
 		String result = "";
 		String resultText = "";
